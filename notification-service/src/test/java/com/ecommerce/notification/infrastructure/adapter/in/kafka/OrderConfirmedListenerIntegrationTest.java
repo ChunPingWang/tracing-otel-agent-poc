@@ -2,6 +2,7 @@ package com.ecommerce.notification.infrastructure.adapter.in.kafka;
 
 import com.ecommerce.notification.application.dto.OrderNotificationCommand;
 import com.ecommerce.notification.application.port.in.ProcessOrderNotificationPort;
+import com.ecommerce.notification.infrastructure.config.FailureSimulatorConfig;
 import com.ecommerce.notification.infrastructure.dto.OrderConfirmedMessage;
 import org.junit.jupiter.api.Test;
 
@@ -12,11 +13,14 @@ import static org.mockito.Mockito.*;
 
 public class OrderConfirmedListenerIntegrationTest {
 
+    private final FailureSimulatorConfig failureSimulatorConfig = new FailureSimulatorConfig();
+
     @Test
     void should_consume_order_confirmed_event_and_delegate_to_port() {
         // Given
         ProcessOrderNotificationPort notificationPort = mock(ProcessOrderNotificationPort.class);
-        OrderConfirmedListener listener = new OrderConfirmedListener(notificationPort);
+        OrderConfirmedListener listener =
+                new OrderConfirmedListener(notificationPort, failureSimulatorConfig);
 
         OrderConfirmedMessage message = new OrderConfirmedMessage();
         message.setOrderId("ORD-001");
@@ -41,7 +45,8 @@ public class OrderConfirmedListenerIntegrationTest {
     void should_map_message_fields_correctly() {
         // Given
         ProcessOrderNotificationPort notificationPort = mock(ProcessOrderNotificationPort.class);
-        OrderConfirmedListener listener = new OrderConfirmedListener(notificationPort);
+        OrderConfirmedListener listener =
+                new OrderConfirmedListener(notificationPort, failureSimulatorConfig);
 
         OrderConfirmedMessage message = new OrderConfirmedMessage();
         message.setOrderId("ORD-999");

@@ -215,15 +215,15 @@
 
 ### Tests for User Story 4 (TDD)
 
-- [ ] T099 [P] [US4] Write integration test for OrderConfirmedListener failure retry (3 retries then DLT) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerRetryIntegrationTest.java
-- [ ] T100 [P] [US4] Write integration test for AdminController failure simulation (POST /api/admin/simulate-failure) in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminControllerIntegrationTest.java
+- [x] T099 [P] [US4] Write integration test for OrderConfirmedListener failure retry (3 retries then DLT) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerRetryIntegrationTest.java
+- [x] T100 [P] [US4] Write integration test for AdminController failure simulation (POST /api/admin/simulate-failure) in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminControllerIntegrationTest.java
 
 ### Implementation for User Story 4
 
-- [ ] T101 [US4] Configure Spring Kafka retry with max 3 attempts and DLT (order-confirmed.DLT) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
-- [ ] T102 [US4] Implement FailureSimulatorConfig (thread-safe boolean toggle) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/FailureSimulatorConfig.java
-- [ ] T103 [US4] Implement AdminController (POST /api/admin/simulate-failure?enabled=) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminController.java
-- [ ] T104 [US4] Wire failure simulation into OrderConfirmedListener (check toggle → throw exception to trigger retry) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
+- [x] T101 [US4] Configure Spring Kafka retry with max 3 attempts and DLT (order-confirmed.DLT) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
+- [x] T102 [US4] Implement FailureSimulatorConfig (thread-safe boolean toggle) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/FailureSimulatorConfig.java
+- [x] T103 [US4] Implement AdminController (POST /api/admin/simulate-failure?enabled=) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminController.java
+- [x] T104 [US4] Wire failure simulation into OrderConfirmedListener (check toggle → throw exception to trigger retry) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
 
 **Checkpoint**: Kafka 消費失敗、重試、DLT 場景完成。Jaeger 中所有重試 Span 可追蹤。
 
