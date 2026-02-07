@@ -237,15 +237,15 @@
 
 ### Tests for User Story 5 (TDD)
 
-- [ ] T105 [P] [US5] Write verification test to assert no OTel/tracing imports in any service's main source code in order-service/src/test/java/com/ecommerce/order/ZeroIntrusionVerificationTest.java
+- [x] T105 [P] [US5] Write verification test to assert no OTel/tracing imports in any service's main source code in order-service/src/test/java/com/ecommerce/order/ZeroIntrusionVerificationTest.java
 
 ### Implementation for User Story 5
 
-- [ ] T106 [US5] Create docker-compose.no-agent.yml (same services but without JAVA_TOOL_OPTIONS agent flag) for baseline performance testing
-- [ ] T107 [US5] Create benchmark shell script (100 requests, exclude first 10 warmup, compare avg response time with/without agent) in scripts/benchmark.sh
-- [ ] T108 [US5] Create startup time measurement script (record JVM startup time with/without agent for all 5 services) in scripts/startup-benchmark.sh
-- [ ] T109 [US5] Create graceful degradation test script (stop Jaeger container → send requests → verify services still respond normally) in scripts/graceful-degradation-test.sh
-- [ ] T110 [US5] Create performance report template in docs/performance-report.md with placeholders for benchmark results
+- [x] T106 [US5] Create docker-compose.no-agent.yml (same services but without JAVA_TOOL_OPTIONS agent flag) for baseline performance testing
+- [x] T107 [US5] Create benchmark shell script (100 requests, exclude first 10 warmup, compare avg response time with/without agent) in scripts/benchmark.sh
+- [x] T108 [US5] Create startup time measurement script (record JVM startup time with/without agent for all 5 services) in scripts/startup-benchmark.sh
+- [x] T109 [US5] Create graceful degradation test script (stop Jaeger container → send requests → verify services still respond normally) in scripts/graceful-degradation-test.sh
+- [x] T110 [US5] Create performance report template in docs/performance-report.md with placeholders for benchmark results
 
 **Checkpoint**: 零侵入已驗證，效能基準測試腳本就緒，graceful degradation 已測試。
 
