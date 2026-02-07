@@ -25,17 +25,17 @@
 
 **Purpose**: Project initialization, Maven project structure, shared configuration
 
-- [ ] T001 Create root project directory structure with 5 service directories (order-service/, product-service/, inventory-service/, payment-service/, notification-service/)
-- [ ] T002 [P] Initialize order-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in order-service/pom.xml
-- [ ] T003 [P] Initialize product-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in product-service/pom.xml
-- [ ] T004 [P] Initialize inventory-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in inventory-service/pom.xml
-- [ ] T005 [P] Initialize payment-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in payment-service/pom.xml
-- [ ] T006 [P] Initialize notification-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in notification-service/pom.xml
-- [ ] T007 [P] Create hexagonal architecture package structure for all 5 services (domain/model, domain/event, domain/service, domain/port, application/service, application/port/in, application/port/out, application/dto, application/mapper, infrastructure/adapter/in/rest, infrastructure/adapter/out/persistence, infrastructure/config, infrastructure/dto, infrastructure/mapper)
-- [ ] T008 [P] Add test dependencies to all pom.xml files (JUnit 5, Spring Boot Test, spring-kafka-test for order/notification services, ArchUnit for all services)
-- [ ] T009 [P] Configure Checkstyle plugin in all pom.xml files with method length ≤ 20 lines and cyclomatic complexity ≤ 10 rules
-- [ ] T010 [P] Create Spring Boot application.yml for each service with server port, H2 console, JPA DDL-auto settings (order:8081, product:8082, inventory:8083, payment:8084, notification:8085)
-- [ ] T011 [P] Create Spring Boot main application class for each service (OrderApplication.java, ProductApplication.java, etc.)
+- [x] T001 Create root project directory structure with 5 service directories (order-service/, product-service/, inventory-service/, payment-service/, notification-service/)
+- [x] T002 [P] Initialize order-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in order-service/pom.xml
+- [x] T003 [P] Initialize product-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in product-service/pom.xml
+- [x] T004 [P] Initialize inventory-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in inventory-service/pom.xml
+- [x] T005 [P] Initialize payment-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in payment-service/pom.xml
+- [x] T006 [P] Initialize notification-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in notification-service/pom.xml
+- [x] T007 [P] Create hexagonal architecture package structure for all 5 services (domain/model, domain/event, domain/service, domain/port, application/service, application/port/in, application/port/out, application/dto, application/mapper, infrastructure/adapter/in/rest, infrastructure/adapter/out/persistence, infrastructure/config, infrastructure/dto, infrastructure/mapper)
+- [x] T008 [P] Add test dependencies to all pom.xml files (JUnit 5, Spring Boot Test, spring-kafka-test for order/notification services, ArchUnit for all services)
+- [x] T009 [P] Configure Checkstyle plugin in all pom.xml files with method length ≤ 20 lines and cyclomatic complexity ≤ 10 rules
+- [x] T010 [P] Create Spring Boot application.yml for each service with server port, H2 console, JPA DDL-auto settings (order:8081, product:8082, inventory:8083, payment:8084, notification:8085)
+- [x] T011 [P] Create Spring Boot main application class for each service (OrderApplication.java, ProductApplication.java, etc.)
 
 ---
 
@@ -47,63 +47,63 @@
 
 ### Architecture Tests
 
-- [ ] T012 [P] Write ArchUnit test to enforce hexagonal layering constraints (domain MUST NOT depend on application/infrastructure, application MUST NOT depend on infrastructure) in order-service/src/test/java/com/ecommerce/order/ArchitectureTest.java
-- [ ] T013 [P] Write ArchUnit test for product-service in product-service/src/test/java/com/ecommerce/product/ArchitectureTest.java
-- [ ] T014 [P] Write ArchUnit test for inventory-service in inventory-service/src/test/java/com/ecommerce/inventory/ArchitectureTest.java
-- [ ] T015 [P] Write ArchUnit test for payment-service in payment-service/src/test/java/com/ecommerce/payment/ArchitectureTest.java
-- [ ] T016 [P] Write ArchUnit test for notification-service in notification-service/src/test/java/com/ecommerce/notification/ArchitectureTest.java
+- [x] T012 [P] Write ArchUnit test to enforce hexagonal layering constraints (domain MUST NOT depend on application/infrastructure, application MUST NOT depend on infrastructure) in order-service/src/test/java/com/ecommerce/order/ArchitectureTest.java
+- [x] T013 [P] Write ArchUnit test for product-service in product-service/src/test/java/com/ecommerce/product/ArchitectureTest.java
+- [x] T014 [P] Write ArchUnit test for inventory-service in inventory-service/src/test/java/com/ecommerce/inventory/ArchitectureTest.java
+- [x] T015 [P] Write ArchUnit test for payment-service in payment-service/src/test/java/com/ecommerce/payment/ArchitectureTest.java
+- [x] T016 [P] Write ArchUnit test for notification-service in notification-service/src/test/java/com/ecommerce/notification/ArchitectureTest.java
 
 ### Domain Models (all services)
 
-- [ ] T017 [P] Write unit test for Order domain model (creation, state transitions) in order-service/src/test/java/com/ecommerce/order/domain/model/OrderTest.java
-- [ ] T018 [P] Implement Order aggregate root with OrderItem, OrderStatus (CREATED/CONFIRMED/FAILED/PAYMENT_TIMEOUT), CustomerId value object in order-service/src/main/java/com/ecommerce/order/domain/model/
-- [ ] T019 [P] Write unit test for Product domain model in product-service/src/test/java/com/ecommerce/product/domain/model/ProductTest.java
-- [ ] T020 [P] Implement Product entity in product-service/src/main/java/com/ecommerce/product/domain/model/Product.java
-- [ ] T021 [P] Write unit test for Inventory domain model (reserve, release, insufficient stock) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java
-- [ ] T022 [P] Implement Inventory entity with reserve()/release() domain logic in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/Inventory.java
-- [ ] T023 [P] Write unit test for Payment domain model in payment-service/src/test/java/com/ecommerce/payment/domain/model/PaymentTest.java
-- [ ] T024 [P] Implement Payment entity with PaymentStatus (SUCCESS/FAILED) in payment-service/src/main/java/com/ecommerce/payment/domain/model/
-- [ ] T025 [P] Write unit test for Notification domain model in notification-service/src/test/java/com/ecommerce/notification/domain/model/NotificationTest.java
-- [ ] T026 [P] Implement Notification entity with NotificationStatus (SENT/FAILED) and Customer entity in notification-service/src/main/java/com/ecommerce/notification/domain/model/
+- [x] T017 [P] Write unit test for Order domain model (creation, state transitions) in order-service/src/test/java/com/ecommerce/order/domain/model/OrderTest.java
+- [x] T018 [P] Implement Order aggregate root with OrderItem, OrderStatus (CREATED/CONFIRMED/FAILED/PAYMENT_TIMEOUT), CustomerId value object in order-service/src/main/java/com/ecommerce/order/domain/model/
+- [x] T019 [P] Write unit test for Product domain model in product-service/src/test/java/com/ecommerce/product/domain/model/ProductTest.java
+- [x] T020 [P] Implement Product entity in product-service/src/main/java/com/ecommerce/product/domain/model/Product.java
+- [x] T021 [P] Write unit test for Inventory domain model (reserve, release, insufficient stock) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java
+- [x] T022 [P] Implement Inventory entity with reserve()/release() domain logic in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/Inventory.java
+- [x] T023 [P] Write unit test for Payment domain model in payment-service/src/test/java/com/ecommerce/payment/domain/model/PaymentTest.java
+- [x] T024 [P] Implement Payment entity with PaymentStatus (SUCCESS/FAILED) in payment-service/src/main/java/com/ecommerce/payment/domain/model/
+- [x] T025 [P] Write unit test for Notification domain model in notification-service/src/test/java/com/ecommerce/notification/domain/model/NotificationTest.java
+- [x] T026 [P] Implement Notification entity with NotificationStatus (SENT/FAILED) and Customer entity in notification-service/src/main/java/com/ecommerce/notification/domain/model/
 
 ### Domain Events
 
-- [ ] T027 [P] Implement OrderConfirmedEvent domain event in order-service/src/main/java/com/ecommerce/order/domain/event/OrderConfirmedEvent.java
+- [x] T027 [P] Implement OrderConfirmedEvent domain event in order-service/src/main/java/com/ecommerce/order/domain/event/OrderConfirmedEvent.java
 
 ### Port Interfaces (all services)
 
-- [ ] T028 [P] Define OrderRepository port interface in order-service/src/main/java/com/ecommerce/order/domain/port/OrderRepository.java
-- [ ] T029 [P] Define ProductRepository port interface in product-service/src/main/java/com/ecommerce/product/domain/port/ProductRepository.java
-- [ ] T030 [P] Define InventoryRepository port interface in inventory-service/src/main/java/com/ecommerce/inventory/domain/port/InventoryRepository.java
-- [ ] T031 [P] Define PaymentRepository port interface in payment-service/src/main/java/com/ecommerce/payment/domain/port/PaymentRepository.java
-- [ ] T032 [P] Define NotificationRepository and CustomerRepository port interfaces in notification-service/src/main/java/com/ecommerce/notification/domain/port/
+- [x] T028 [P] Define OrderRepository port interface in order-service/src/main/java/com/ecommerce/order/domain/port/OrderRepository.java
+- [x] T029 [P] Define ProductRepository port interface in product-service/src/main/java/com/ecommerce/product/domain/port/ProductRepository.java
+- [x] T030 [P] Define InventoryRepository port interface in inventory-service/src/main/java/com/ecommerce/inventory/domain/port/InventoryRepository.java
+- [x] T031 [P] Define PaymentRepository port interface in payment-service/src/main/java/com/ecommerce/payment/domain/port/PaymentRepository.java
+- [x] T032 [P] Define NotificationRepository and CustomerRepository port interfaces in notification-service/src/main/java/com/ecommerce/notification/domain/port/
 
 ### JPA Persistence Adapters (all services)
 
-- [ ] T033 [P] Write integration test for JPA order repository in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/persistence/JpaOrderRepositoryIntegrationTest.java
-- [ ] T034 [P] Implement OrderJpaEntity and JpaOrderRepository adapter in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/persistence/
-- [ ] T035 [P] Write integration test for JPA product repository in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/out/persistence/JpaProductRepositoryIntegrationTest.java
-- [ ] T036 [P] Implement ProductJpaEntity and JpaProductRepository adapter in product-service/src/main/java/com/ecommerce/product/infrastructure/adapter/out/persistence/
-- [ ] T037 [P] Write integration test for JPA inventory repository in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/JpaInventoryRepositoryIntegrationTest.java
-- [ ] T038 [P] Implement InventoryJpaEntity and JpaInventoryRepository adapter in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/
-- [ ] T039 [P] Write integration test for JPA payment repository in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/JpaPaymentRepositoryIntegrationTest.java
-- [ ] T040 [P] Implement PaymentJpaEntity and JpaPaymentRepository adapter in payment-service/src/main/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/
-- [ ] T041 [P] Write integration test for JPA notification/customer repositories in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/JpaNotificationRepositoryIntegrationTest.java
-- [ ] T042 [P] Implement NotificationJpaEntity, CustomerJpaEntity, JpaNotificationRepository, JpaCustomerRepository adapters in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/
+- [x] T033 [P] Write integration test for JPA order repository in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/persistence/JpaOrderRepositoryIntegrationTest.java
+- [x] T034 [P] Implement OrderJpaEntity and JpaOrderRepository adapter in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/persistence/
+- [x] T035 [P] Write integration test for JPA product repository in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/out/persistence/JpaProductRepositoryIntegrationTest.java
+- [x] T036 [P] Implement ProductJpaEntity and JpaProductRepository adapter in product-service/src/main/java/com/ecommerce/product/infrastructure/adapter/out/persistence/
+- [x] T037 [P] Write integration test for JPA inventory repository in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/JpaInventoryRepositoryIntegrationTest.java
+- [x] T038 [P] Implement InventoryJpaEntity and JpaInventoryRepository adapter in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/
+- [x] T039 [P] Write integration test for JPA payment repository in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/JpaPaymentRepositoryIntegrationTest.java
+- [x] T040 [P] Implement PaymentJpaEntity and JpaPaymentRepository adapter in payment-service/src/main/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/
+- [x] T041 [P] Write integration test for JPA notification/customer repositories in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/JpaNotificationRepositoryIntegrationTest.java
+- [x] T042 [P] Implement NotificationJpaEntity, CustomerJpaEntity, JpaNotificationRepository, JpaCustomerRepository adapters in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/
 
 ### Initial Data
 
-- [ ] T043 [P] Create data.sql with initial product data (P001, P002, P003) in product-service/src/main/resources/data.sql
-- [ ] T044 [P] Create data.sql with initial inventory data in inventory-service/src/main/resources/data.sql
-- [ ] T045 [P] Create data.sql with initial customer data (C001, C002) in notification-service/src/main/resources/data.sql
+- [x] T043 [P] Create data.sql with initial product data (P001, P002, P003) in product-service/src/main/resources/data.sql
+- [x] T044 [P] Create data.sql with initial inventory data in inventory-service/src/main/resources/data.sql
+- [x] T045 [P] Create data.sql with initial customer data (C001, C002) in notification-service/src/main/resources/data.sql
 
 ### Mapper Classes
 
-- [ ] T046 [P] Create infrastructure and application mapper classes for order-service in order-service/src/main/java/com/ecommerce/order/infrastructure/mapper/OrderInfraMapper.java and order-service/src/main/java/com/ecommerce/order/application/mapper/OrderApplicationMapper.java
-- [ ] T047 [P] Create infrastructure and application mapper classes for product-service in product-service/src/main/java/com/ecommerce/product/infrastructure/mapper/ProductInfraMapper.java and product-service/src/main/java/com/ecommerce/product/application/mapper/ProductApplicationMapper.java
-- [ ] T048 [P] Create infrastructure and application mapper classes for inventory-service in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/mapper/InventoryInfraMapper.java and inventory-service/src/main/java/com/ecommerce/inventory/application/mapper/InventoryApplicationMapper.java
-- [ ] T049 [P] Create infrastructure and application mapper classes for payment-service in payment-service/src/main/java/com/ecommerce/payment/infrastructure/mapper/PaymentInfraMapper.java and payment-service/src/main/java/com/ecommerce/payment/application/mapper/PaymentApplicationMapper.java
-- [ ] T050 [P] Create infrastructure and application mapper classes for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/mapper/NotificationInfraMapper.java and notification-service/src/main/java/com/ecommerce/notification/application/mapper/NotificationApplicationMapper.java
+- [x] T046 [P] Create infrastructure and application mapper classes for order-service in order-service/src/main/java/com/ecommerce/order/infrastructure/mapper/OrderInfraMapper.java and order-service/src/main/java/com/ecommerce/order/application/mapper/OrderApplicationMapper.java
+- [x] T047 [P] Create infrastructure and application mapper classes for product-service in product-service/src/main/java/com/ecommerce/product/infrastructure/mapper/ProductInfraMapper.java and product-service/src/main/java/com/ecommerce/product/application/mapper/ProductApplicationMapper.java
+- [x] T048 [P] Create infrastructure and application mapper classes for inventory-service in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/mapper/InventoryInfraMapper.java and inventory-service/src/main/java/com/ecommerce/inventory/application/mapper/InventoryApplicationMapper.java
+- [x] T049 [P] Create infrastructure and application mapper classes for payment-service in payment-service/src/main/java/com/ecommerce/payment/infrastructure/mapper/PaymentInfraMapper.java and payment-service/src/main/java/com/ecommerce/payment/application/mapper/PaymentApplicationMapper.java
+- [x] T050 [P] Create infrastructure and application mapper classes for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/mapper/NotificationInfraMapper.java and notification-service/src/main/java/com/ecommerce/notification/application/mapper/NotificationApplicationMapper.java
 
 **Checkpoint**: Foundation ready — all domain models, port interfaces, JPA adapters, mappers, and ArchUnit tests in place. User story implementation can now begin.
 
@@ -119,32 +119,32 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T051 [P] [US1] Write unit test for QueryProductUseCase in product-service/src/test/java/com/ecommerce/product/application/service/QueryProductUseCaseTest.java
-- [ ] T052 [P] [US1] Write unit test for ReserveInventoryUseCase in inventory-service/src/test/java/com/ecommerce/inventory/application/service/ReserveInventoryUseCaseTest.java
-- [ ] T053 [P] [US1] Write unit test for ProcessPaymentUseCase in payment-service/src/test/java/com/ecommerce/payment/application/service/ProcessPaymentUseCaseTest.java
-- [ ] T054 [P] [US1] Write unit test for CreateOrderUseCase (happy path: product query → inventory reserve → payment → confirm) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java
-- [ ] T055 [P] [US1] Write integration test for ProductController (GET /api/products/{id}) in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/in/rest/ProductControllerIntegrationTest.java
-- [ ] T056 [P] [US1] Write integration test for InventoryController (POST /api/inventory/reserve) in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/in/rest/InventoryControllerIntegrationTest.java
-- [ ] T057 [P] [US1] Write integration test for PaymentController (POST /api/payments) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java
-- [ ] T058 [P] [US1] Write integration test for OrderController (POST /api/orders, happy path) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java
+- [x] T051 [P] [US1] Write unit test for QueryProductUseCase in product-service/src/test/java/com/ecommerce/product/application/service/QueryProductUseCaseTest.java
+- [x] T052 [P] [US1] Write unit test for ReserveInventoryUseCase in inventory-service/src/test/java/com/ecommerce/inventory/application/service/ReserveInventoryUseCaseTest.java
+- [x] T053 [P] [US1] Write unit test for ProcessPaymentUseCase in payment-service/src/test/java/com/ecommerce/payment/application/service/ProcessPaymentUseCaseTest.java
+- [x] T054 [P] [US1] Write unit test for CreateOrderUseCase (happy path: product query → inventory reserve → payment → confirm) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java
+- [x] T055 [P] [US1] Write integration test for ProductController (GET /api/products/{id}) in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/in/rest/ProductControllerIntegrationTest.java
+- [x] T056 [P] [US1] Write integration test for InventoryController (POST /api/inventory/reserve) in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/in/rest/InventoryControllerIntegrationTest.java
+- [x] T057 [P] [US1] Write integration test for PaymentController (POST /api/payments) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java
+- [x] T058 [P] [US1] Write integration test for OrderController (POST /api/orders, happy path) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java
 
 ### Implementation for User Story 1
 
-- [ ] T059 [P] [US1] Implement QueryProductPort (inbound) and QueryProductUseCase in product-service/src/main/java/com/ecommerce/product/application/
-- [ ] T060 [P] [US1] Implement ProductController REST adapter (GET /api/products/{id}) with ProductResponse DTO and ProductInfraMapper in product-service/src/main/java/com/ecommerce/product/infrastructure/
-- [ ] T061 [P] [US1] Implement ReserveInventoryPort, ReleaseInventoryPort (inbound) and ReserveInventoryUseCase with InventoryDomainService in inventory-service/src/main/java/com/ecommerce/inventory/application/
-- [ ] T062 [P] [US1] Implement InventoryController REST adapter (POST /api/inventory/reserve, POST /api/inventory/release) with DTOs and mapper in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/
-- [ ] T063 [P] [US1] Implement ProcessPaymentPort (inbound) and ProcessPaymentUseCase in payment-service/src/main/java/com/ecommerce/payment/application/
-- [ ] T064 [P] [US1] Implement PaymentController REST adapter (POST /api/payments) with DTOs and mapper in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
-- [ ] T065 [US1] Define outbound port interfaces for order-service (ProductQueryPort, InventoryReservePort, PaymentPort, OrderEventPublisherPort) in order-service/src/main/java/com/ecommerce/order/application/port/out/
-- [ ] T066 [US1] Implement CreateOrderPort (inbound) and CreateOrderUseCase (orchestrates: query product → reserve inventory → process payment → confirm order) in order-service/src/main/java/com/ecommerce/order/application/
-- [ ] T067 [US1] Configure RestTemplate with 3s timeout in order-service/src/main/java/com/ecommerce/order/infrastructure/config/RestTemplateConfig.java
-- [ ] T068 [P] [US1] Implement ProductServiceClient (outbound REST adapter for ProductQueryPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/ProductServiceClient.java
-- [ ] T069 [P] [US1] Implement InventoryServiceClient (outbound REST adapter for InventoryReservePort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/InventoryServiceClient.java
-- [ ] T070 [P] [US1] Implement PaymentServiceClient (outbound REST adapter for PaymentPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/PaymentServiceClient.java
-- [ ] T071 [US1] Implement OrderController REST adapter (POST /api/orders) with CreateOrderRequest/Response DTOs and OrderInfraMapper in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/in/rest/
-- [ ] T072 [US1] Create Dockerfile for each of the 4 services (order, product, inventory, payment) based on openjdk:8-jre-slim with OTel Agent download
-- [ ] T073 [US1] Create docker-compose.yml with Jaeger (all-in-one) + 4 services (order, product, inventory, payment) with OTel Agent environment variables
+- [x] T059 [P] [US1] Implement QueryProductPort (inbound) and QueryProductUseCase in product-service/src/main/java/com/ecommerce/product/application/
+- [x] T060 [P] [US1] Implement ProductController REST adapter (GET /api/products/{id}) with ProductResponse DTO and ProductInfraMapper in product-service/src/main/java/com/ecommerce/product/infrastructure/
+- [x] T061 [P] [US1] Implement ReserveInventoryPort, ReleaseInventoryPort (inbound) and ReserveInventoryUseCase with InventoryDomainService in inventory-service/src/main/java/com/ecommerce/inventory/application/
+- [x] T062 [P] [US1] Implement InventoryController REST adapter (POST /api/inventory/reserve, POST /api/inventory/release) with DTOs and mapper in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/
+- [x] T063 [P] [US1] Implement ProcessPaymentPort (inbound) and ProcessPaymentUseCase in payment-service/src/main/java/com/ecommerce/payment/application/
+- [x] T064 [P] [US1] Implement PaymentController REST adapter (POST /api/payments) with DTOs and mapper in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
+- [x] T065 [US1] Define outbound port interfaces for order-service (ProductQueryPort, InventoryReservePort, PaymentPort, OrderEventPublisherPort) in order-service/src/main/java/com/ecommerce/order/application/port/out/
+- [x] T066 [US1] Implement CreateOrderPort (inbound) and CreateOrderUseCase (orchestrates: query product → reserve inventory → process payment → confirm order) in order-service/src/main/java/com/ecommerce/order/application/
+- [x] T067 [US1] Configure RestTemplate with 3s timeout in order-service/src/main/java/com/ecommerce/order/infrastructure/config/RestTemplateConfig.java
+- [x] T068 [P] [US1] Implement ProductServiceClient (outbound REST adapter for ProductQueryPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/ProductServiceClient.java
+- [x] T069 [P] [US1] Implement InventoryServiceClient (outbound REST adapter for InventoryReservePort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/InventoryServiceClient.java
+- [x] T070 [P] [US1] Implement PaymentServiceClient (outbound REST adapter for PaymentPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/PaymentServiceClient.java
+- [x] T071 [US1] Implement OrderController REST adapter (POST /api/orders) with CreateOrderRequest/Response DTOs and OrderInfraMapper in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/in/rest/
+- [x] T072 [US1] Create Dockerfile for each of the 4 services (order, product, inventory, payment) based on openjdk:8-jre-slim with OTel Agent download
+- [x] T073 [US1] Create docker-compose.yml with Jaeger (all-in-one) + 4 services (order, product, inventory, payment) with OTel Agent environment variables
 
 **Checkpoint**: Happy Path 下單流程完成。`docker-compose up` 後發送 POST /api/orders，在 Jaeger UI 看到 Order → Product → Inventory → Payment 完整 Trace。
 
@@ -158,19 +158,19 @@
 
 ### Tests for User Story 2 (TDD)
 
-- [ ] T074 [P] [US2] Write unit test for CreateOrderUseCase (inventory insufficient scenario: status=FAILED, no payment call) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
-- [ ] T075 [P] [US2] Write unit test for CreateOrderUseCase (payment timeout scenario: status=PAYMENT_TIMEOUT, inventory release called) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
-- [ ] T076 [P] [US2] Write unit test for InventoryDomainService (insufficient stock throws domain exception) in inventory-service/src/test/java/com/ecommerce/inventory/domain/service/InventoryDomainServiceTest.java
-- [ ] T077 [P] [US2] Write integration test for OrderController (inventory insufficient scenario) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java (add test method)
-- [ ] T078 [P] [US2] Write integration test for PaymentController delay simulation endpoint (POST /api/admin/simulate-delay) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java (add test method)
+- [x] T074 [P] [US2] Write unit test for CreateOrderUseCase (inventory insufficient scenario: status=FAILED, no payment call) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
+- [x] T075 [P] [US2] Write unit test for CreateOrderUseCase (payment timeout scenario: status=PAYMENT_TIMEOUT, inventory release called) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
+- [x] T076 [P] [US2] Write unit test for InventoryDomainService (insufficient stock throws domain exception) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java (已由 InventoryTest.should_throw_when_insufficient_stock 涵蓋)
+- [x] T077 [P] [US2] Write integration test for OrderController (inventory insufficient scenario) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java (add test method)
+- [x] T078 [P] [US2] Write integration test for PaymentController delay simulation endpoint (POST /api/admin/simulate-delay) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java (add test method)
 
 ### Implementation for User Story 2
 
-- [ ] T079 [US2] Implement InsufficientStockException in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/InsufficientStockException.java and wire into InventoryDomainService
-- [ ] T080 [US2] Add inventory insufficient error handling in CreateOrderUseCase: catch exception → set order status FAILED → skip payment call in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T081 [US2] Add payment timeout handling in CreateOrderUseCase: catch ResourceAccessException → call inventory release → set order status PAYMENT_TIMEOUT in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T082 [US2] Implement ReleaseInventoryUseCase in inventory-service/src/main/java/com/ecommerce/inventory/application/service/ReleaseInventoryUseCase.java
-- [ ] T083 [US2] Implement DelaySimulatorConfig and AdminController (POST /api/admin/simulate-delay?ms=) in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
+- [x] T079 [US2] Implement InsufficientStockException in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/InsufficientStockException.java and wire into InventoryDomainService (已於 Phase 2 完成)
+- [x] T080 [US2] Add inventory insufficient error handling in CreateOrderUseCase: catch exception → set order status FAILED → skip payment call in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T081 [US2] Add payment timeout handling in CreateOrderUseCase: catch ResourceAccessException → call inventory release → set order status PAYMENT_TIMEOUT in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T082 [US2] Implement ReleaseInventoryUseCase in inventory-service/src/main/java/com/ecommerce/inventory/application/service/ReleaseInventoryUseCase.java (已於 Phase 3 完成)
+- [x] T083 [US2] Implement DelaySimulatorConfig and AdminController (POST /api/admin/simulate-delay?ms=) in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
 
 **Checkpoint**: 庫存不足與支付超時場景可正確處理。Jaeger 中可看到 error 標記與長延遲 Span。
 
@@ -184,24 +184,24 @@
 
 ### Tests for User Story 3 (TDD)
 
-- [ ] T084 [P] [US3] Write unit test for ProcessOrderNotificationUseCase in notification-service/src/test/java/com/ecommerce/notification/application/service/ProcessOrderNotificationUseCaseTest.java
-- [ ] T085 [P] [US3] Write integration test for KafkaOrderEventPublisher (publishes to order-confirmed topic) using EmbeddedKafka in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisherIntegrationTest.java
-- [ ] T086 [P] [US3] Write integration test for OrderConfirmedListener (consumes from order-confirmed topic) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerIntegrationTest.java
+- [x] T084 [P] [US3] Write unit test for ProcessOrderNotificationUseCase in notification-service/src/test/java/com/ecommerce/notification/application/service/ProcessOrderNotificationUseCaseTest.java
+- [x] T085 [P] [US3] Write integration test for KafkaOrderEventPublisher (publishes to order-confirmed topic) using EmbeddedKafka in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisherIntegrationTest.java
+- [x] T086 [P] [US3] Write integration test for OrderConfirmedListener (consumes from order-confirmed topic) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerIntegrationTest.java
 
 ### Implementation for User Story 3
 
-- [ ] T087 [US3] Implement OrderEventPublisherPort (outbound) interface in order-service/src/main/java/com/ecommerce/order/application/port/out/OrderEventPublisherPort.java (if not already created in T065)
-- [ ] T088 [US3] Implement KafkaProducerConfig in order-service/src/main/java/com/ecommerce/order/infrastructure/config/KafkaProducerConfig.java
-- [ ] T089 [US3] Implement OrderConfirmedMessage infrastructure DTO in order-service/src/main/java/com/ecommerce/order/infrastructure/dto/OrderConfirmedMessage.java
-- [ ] T090 [US3] Implement KafkaOrderEventPublisher (outbound adapter using KafkaTemplate) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisher.java
-- [ ] T091 [US3] Wire Kafka event publishing into CreateOrderUseCase (publish after order confirmed) in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T092 [US3] Implement ProcessOrderNotificationPort (inbound) and ProcessOrderNotificationUseCase (query customer → send notification → persist) in notification-service/src/main/java/com/ecommerce/notification/application/
-- [ ] T093 [US3] Implement NotificationSenderPort (outbound) and MockNotificationSender adapter in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/sender/MockNotificationSender.java
-- [ ] T094 [US3] Implement KafkaConsumerConfig in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
-- [ ] T095 [US3] Implement OrderConfirmedMessage infrastructure DTO for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/dto/OrderConfirmedMessage.java
-- [ ] T096 [US3] Implement OrderConfirmedListener (@KafkaListener, inbound Kafka adapter) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
-- [ ] T097 [US3] Create Dockerfile for notification-service with OTel Agent in notification-service/Dockerfile
-- [ ] T098 [US3] Update docker-compose.yml to add Kafka broker (KRaft mode) and notification-service with OTel Agent environment variables
+- [x] T087 [US3] Implement OrderEventPublisherPort (outbound) interface in order-service/src/main/java/com/ecommerce/order/application/port/out/OrderEventPublisherPort.java (已於 T065 完成)
+- [x] T088 [US3] Implement KafkaProducerConfig in order-service (Spring Boot 自動設定已足夠，無需額外 Config)
+- [x] T089 [US3] Implement OrderConfirmedMessage infrastructure DTO in order-service/src/main/java/com/ecommerce/order/infrastructure/dto/OrderConfirmedMessage.java
+- [x] T090 [US3] Implement KafkaOrderEventPublisher (outbound adapter using KafkaTemplate) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisher.java
+- [x] T091 [US3] Wire Kafka event publishing into CreateOrderUseCase (publish after order confirmed) in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T092 [US3] Implement ProcessOrderNotificationPort (inbound) and ProcessOrderNotificationUseCase (query customer → send notification → persist) in notification-service/src/main/java/com/ecommerce/notification/application/
+- [x] T093 [US3] Implement NotificationSenderPort (outbound) and MockNotificationSender adapter in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/sender/MockNotificationSender.java
+- [x] T094 [US3] Implement KafkaConsumerConfig in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
+- [x] T095 [US3] Implement OrderConfirmedMessage infrastructure DTO for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/dto/OrderConfirmedMessage.java
+- [x] T096 [US3] Implement OrderConfirmedListener (@KafkaListener, inbound Kafka adapter) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
+- [x] T097 [US3] Create Dockerfile for notification-service with OTel Agent in notification-service/Dockerfile
+- [x] T098 [US3] Update docker-compose.yml to add Kafka broker (KRaft mode) and notification-service with OTel Agent environment variables
 
 **Checkpoint**: 完整 5 服務鏈路可追蹤。Jaeger 同一條 Trace 涵蓋 HTTP 同步段 + Kafka 非同步段。
 
@@ -215,15 +215,15 @@
 
 ### Tests for User Story 4 (TDD)
 
-- [ ] T099 [P] [US4] Write integration test for OrderConfirmedListener failure retry (3 retries then DLT) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerRetryIntegrationTest.java
-- [ ] T100 [P] [US4] Write integration test for AdminController failure simulation (POST /api/admin/simulate-failure) in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminControllerIntegrationTest.java
+- [x] T099 [P] [US4] Write integration test for OrderConfirmedListener failure retry (3 retries then DLT) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerRetryIntegrationTest.java
+- [x] T100 [P] [US4] Write integration test for AdminController failure simulation (POST /api/admin/simulate-failure) in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminControllerIntegrationTest.java
 
 ### Implementation for User Story 4
 
-- [ ] T101 [US4] Configure Spring Kafka retry with max 3 attempts and DLT (order-confirmed.DLT) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
-- [ ] T102 [US4] Implement FailureSimulatorConfig (thread-safe boolean toggle) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/FailureSimulatorConfig.java
-- [ ] T103 [US4] Implement AdminController (POST /api/admin/simulate-failure?enabled=) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminController.java
-- [ ] T104 [US4] Wire failure simulation into OrderConfirmedListener (check toggle → throw exception to trigger retry) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
+- [x] T101 [US4] Configure Spring Kafka retry with max 3 attempts and DLT (order-confirmed.DLT) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
+- [x] T102 [US4] Implement FailureSimulatorConfig (thread-safe boolean toggle) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/FailureSimulatorConfig.java
+- [x] T103 [US4] Implement AdminController (POST /api/admin/simulate-failure?enabled=) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/rest/AdminController.java
+- [x] T104 [US4] Wire failure simulation into OrderConfirmedListener (check toggle → throw exception to trigger retry) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
 
 **Checkpoint**: Kafka 消費失敗、重試、DLT 場景完成。Jaeger 中所有重試 Span 可追蹤。
 
@@ -237,15 +237,15 @@
 
 ### Tests for User Story 5 (TDD)
 
-- [ ] T105 [P] [US5] Write verification test to assert no OTel/tracing imports in any service's main source code in order-service/src/test/java/com/ecommerce/order/ZeroIntrusionVerificationTest.java
+- [x] T105 [P] [US5] Write verification test to assert no OTel/tracing imports in any service's main source code in order-service/src/test/java/com/ecommerce/order/ZeroIntrusionVerificationTest.java
 
 ### Implementation for User Story 5
 
-- [ ] T106 [US5] Create docker-compose.no-agent.yml (same services but without JAVA_TOOL_OPTIONS agent flag) for baseline performance testing
-- [ ] T107 [US5] Create benchmark shell script (100 requests, exclude first 10 warmup, compare avg response time with/without agent) in scripts/benchmark.sh
-- [ ] T108 [US5] Create startup time measurement script (record JVM startup time with/without agent for all 5 services) in scripts/startup-benchmark.sh
-- [ ] T109 [US5] Create graceful degradation test script (stop Jaeger container → send requests → verify services still respond normally) in scripts/graceful-degradation-test.sh
-- [ ] T110 [US5] Create performance report template in docs/performance-report.md with placeholders for benchmark results
+- [x] T106 [US5] Create docker-compose.no-agent.yml (same services but without JAVA_TOOL_OPTIONS agent flag) for baseline performance testing
+- [x] T107 [US5] Create benchmark shell script (100 requests, exclude first 10 warmup, compare avg response time with/without agent) in scripts/benchmark.sh
+- [x] T108 [US5] Create startup time measurement script (record JVM startup time with/without agent for all 5 services) in scripts/startup-benchmark.sh
+- [x] T109 [US5] Create graceful degradation test script (stop Jaeger container → send requests → verify services still respond normally) in scripts/graceful-degradation-test.sh
+- [x] T110 [US5] Create performance report template in docs/performance-report.md with placeholders for benchmark results
 
 **Checkpoint**: 零侵入已驗證，效能基準測試腳本就緒，graceful degradation 已測試。
 
@@ -255,14 +255,14 @@
 
 **Purpose**: Documentation, cleanup, final validation
 
-- [ ] T111 [P] Create README.md with project overview, architecture diagram, and quickstart instructions
-- [ ] T112 [P] Add Javadoc to all public API classes across all services
-- [ ] T113 Run all unit tests across all 5 services and verify green
-- [ ] T114 Run all integration tests across all 5 services and verify green
-- [ ] T115 Run all ArchUnit tests and verify hexagonal architecture compliance
-- [ ] T116 Run Checkstyle across all services and fix violations
-- [ ] T117 Execute quickstart.md end-to-end validation: docker-compose up → run all 5 scenarios → verify Jaeger traces
-- [ ] T118 Execute benchmark scripts and fill in performance-report.md with actual results
+- [x] T111 [P] Create README.md with project overview, architecture diagram, and quickstart instructions
+- [x] T112 [P] Add Javadoc to all public API classes across all services
+- [x] T113 Run all unit tests across all 5 services and verify green
+- [x] T114 Run all integration tests across all 5 services and verify green
+- [x] T115 Run all ArchUnit tests and verify hexagonal architecture compliance
+- [x] T116 Run Checkstyle across all services and fix violations
+- [ ] T117 Execute quickstart.md end-to-end validation: docker-compose up → run all 5 scenarios → verify Jaeger traces (需要 Docker 環境手動執行)
+- [ ] T118 Execute benchmark scripts and fill in performance-report.md with actual results (需要 Docker 環境手動執行)
 
 ---
 

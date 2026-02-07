@@ -1,0 +1,12 @@
+[
+  {
+    "id": "1",
+    "plugins": {
+      "opentelemetry": {
+        "sampler": {
+          "name": "always_on"
+        }
+      }
+    }
+  }
+]

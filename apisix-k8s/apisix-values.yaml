@@ -1,0 +1,62 @@
+apisix:
+  enabled: true
+  image:
+    repository: apache/apisix
+    tag: 3.9.1-debian
+
+  admin:
+    enabled: true
+    type: NodePort
+    port: 9180
+    nodePort: 30180
+    adminAPIVersion: v3
+    allow:
+      ipList:
+        - 0.0.0.0/0
+    credentials:
+      admin: "poc-admin-key-2024"
+      viewer: "poc-viewer-key-2024"
+
+  gateway:
+    type: NodePort
+    http:
+      enabled: true
+      containerPort: 9080
+      nodePort: 30080
+    tls:
+      enabled: false
+
+  pluginAttrs:
+    opentelemetry:
+      resource:
+        service.name: "APISIX"
+      collector:
+        address: "jaeger.ecommerce.svc.cluster.local:4318"
+        request_timeout: 3
+      batch_span_processor:
+        drop_on_queue_full: false
+        max_queue_size: 1024
+        batch_timeout: 2
+        inactive_timeout: 1
+        max_export_batch_size: 16
+
+  plugins:
+    - traffic-split
+    - proxy-rewrite
+    - response-rewrite
+    - opentelemetry
+    - real-ip
+    - redirect
+    - public-api
+
+etcd:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    enabled: false
+
+dashboard:
+  enabled: false
+
+ingressController:
+  enabled: false

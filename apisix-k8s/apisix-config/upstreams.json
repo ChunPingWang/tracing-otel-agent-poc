@@ -1,0 +1,68 @@
+[
+  {
+    "id": "1",
+    "name": "order-blue-v1",
+    "desc": "Blue deployment - order-service v1",
+    "type": "roundrobin",
+    "scheme": "http",
+    "nodes": {
+      "order-service-blue.ecommerce.svc.cluster.local:8081": 1
+    },
+    "timeout": {
+      "connect": 5,
+      "send": 10,
+      "read": 10
+    },
+    "checks": {
+      "active": {
+        "type": "http",
+        "http_path": "/h2-console",
+        "healthy": { "interval": 5, "successes": 2 },
+        "unhealthy": { "interval": 3, "http_failures": 3 }
+      }
+    }
+  },
+  {
+    "id": "2",
+    "name": "order-green-v2",
+    "desc": "Green deployment - order-service v2",
+    "type": "roundrobin",
+    "scheme": "http",
+    "nodes": {
+      "order-service-green.ecommerce.svc.cluster.local:8081": 1
+    },
+    "timeout": {
+      "connect": 5,
+      "send": 10,
+      "read": 10
+    },
+    "checks": {
+      "active": {
+        "type": "http",
+        "http_path": "/h2-console",
+        "healthy": { "interval": 5, "successes": 2 },
+        "unhealthy": { "interval": 3, "http_failures": 3 }
+      }
+    }
+  },
+  {
+    "id": "3",
+    "name": "payment-service",
+    "desc": "Payment service for admin endpoints",
+    "type": "roundrobin",
+    "scheme": "http",
+    "nodes": {
+      "payment-service.ecommerce.svc.cluster.local:8084": 1
+    }
+  },
+  {
+    "id": "4",
+    "name": "notification-service",
+    "desc": "Notification service for admin endpoints",
+    "type": "roundrobin",
+    "scheme": "http",
+    "nodes": {
+      "notification-service.ecommerce.svc.cluster.local:8085": 1
+    }
+  }
+]

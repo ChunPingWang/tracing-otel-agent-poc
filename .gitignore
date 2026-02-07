@@ -1,0 +1,48 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+*.swp
+*.swo
+*~
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# H2 Database files
+*.db
+*.mv.db
+*.trace.db
+
+# Environment
+.env
+.env.*
+
+# OpenTelemetry Agent (downloaded at build time)
+opentelemetry-javaagent.jar
+
+# Docker
+*.log*
+
+# Temporary
+*.tmp
+*.bak
