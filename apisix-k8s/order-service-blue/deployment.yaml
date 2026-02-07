@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service-blue
+  namespace: ecommerce
+  labels:
+    app: order-service
+    version: blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: order-service
+        version: blue
+    spec:
+      containers:
+      - name: order-service
+        image: order-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8081
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/opentelemetry-javaagent.jar"
+        - name: OTEL_SERVICE_NAME
+          value: "order-service-blue"
+        - name: OTEL_TRACES_EXPORTER
+          value: "otlp"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://jaeger:4317"
+        - name: OTEL_METRICS_EXPORTER
+          value: "none"
+        - name: OTEL_LOGS_EXPORTER
+          value: "none"
+        - name: APP_VERSION
+          value: "v1-blue"
+        - name: PRODUCT_SERVICE_URL
+          value: "http://product-service:8082"
+        - name: INVENTORY_SERVICE_URL
+          value: "http://inventory-service:8083"
+        - name: PAYMENT_SERVICE_URL
+          value: "http://payment-service:8084"
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        readinessProbe:
+          httpGet:
+            path: /h2-console
+            port: 8081
+          initialDelaySeconds: 40
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

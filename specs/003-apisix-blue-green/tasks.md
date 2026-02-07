@@ -19,9 +19,9 @@
 
 **Purpose**: Create the `apisix-k8s/` directory structure, Kind cluster config, and namespace definition.
 
-- [ ] T001 Create directory structure for `apisix-k8s/` per plan.md: `apisix-k8s/{jaeger,kafka,order-service-blue,order-service-green,product-service,inventory-service,payment-service,notification-service,apisix-config}/`
-- [ ] T002 [P] Create Kind cluster configuration in `apisix-k8s/kind-config.yaml` with extraPortMappings: 30080→9080 (Gateway), 30180→9180 (Admin API), 30686→16686 (Jaeger UI)
-- [ ] T003 [P] Create ecommerce namespace definition in `apisix-k8s/namespace.yaml`
+- [x] T001 Create directory structure for `apisix-k8s/` per plan.md: `apisix-k8s/{jaeger,kafka,order-service-blue,order-service-green,product-service,inventory-service,payment-service,notification-service,apisix-config}/`
+- [x] T002 [P] Create Kind cluster configuration in `apisix-k8s/kind-config.yaml` with extraPortMappings: 30080→9080 (Gateway), 30180→9180 (Admin API), 30686→16686 (Jaeger UI)
+- [x] T003 [P] Create ecommerce namespace definition in `apisix-k8s/namespace.yaml`
 
 ---
 
@@ -31,10 +31,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 [P] Create Kafka Deployment in `apisix-k8s/kafka/deployment.yaml` — image `apache/kafka:3.7.0`, KRaft mode env vars matching docker-compose.yml (KAFKA_NODE_ID, KAFKA_PROCESS_ROLES, KAFKA_LISTENERS, etc.), single replica
-- [ ] T005 [P] Create Kafka Service in `apisix-k8s/kafka/service.yaml` — ClusterIP, port 9092, selector matching Kafka Deployment labels
-- [ ] T006 [P] Create Jaeger Deployment in `apisix-k8s/jaeger/deployment.yaml` — image `jaegertracing/all-in-one:1.53`, env `COLLECTOR_OTLP_ENABLED=true`, ports 16686/4317/4318
-- [ ] T007 [P] Create Jaeger Service in `apisix-k8s/jaeger/service.yaml` — ClusterIP for OTLP ports (4317, 4318) + NodePort 30686 for UI port 16686
+- [x] T004 [P] Create Kafka Deployment in `apisix-k8s/kafka/deployment.yaml` — image `apache/kafka:3.7.0`, KRaft mode env vars matching docker-compose.yml (KAFKA_NODE_ID, KAFKA_PROCESS_ROLES, KAFKA_LISTENERS, etc.), single replica
+- [x] T005 [P] Create Kafka Service in `apisix-k8s/kafka/service.yaml` — ClusterIP, port 9092, selector matching Kafka Deployment labels
+- [x] T006 [P] Create Jaeger Deployment in `apisix-k8s/jaeger/deployment.yaml` — image `jaegertracing/all-in-one:1.53`, env `COLLECTOR_OTLP_ENABLED=true`, ports 16686/4317/4318
+- [x] T007 [P] Create Jaeger Service in `apisix-k8s/jaeger/service.yaml` — ClusterIP for OTLP ports (4317, 4318) + NodePort 30686 for UI port 16686
 
 **Checkpoint**: Kafka and Jaeger manifests ready — microservice deployment can proceed.
 
@@ -48,32 +48,32 @@
 
 ### Microservice K8s Manifests (shared by all stories)
 
-- [ ] T008 [P] [US1] Create product-service Deployment in `apisix-k8s/product-service/deployment.yaml` — image `product-service:latest`, port 8082, OTel env vars (JAVA_TOOL_OPTIONS, OTEL_SERVICE_NAME=product-service, OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317), readiness probe on `/h2-console`
-- [ ] T009 [P] [US1] Create product-service Service in `apisix-k8s/product-service/service.yaml` — ClusterIP, port 8082
-- [ ] T010 [P] [US1] Create inventory-service Deployment in `apisix-k8s/inventory-service/deployment.yaml` — image `inventory-service:latest`, port 8083, OTel env vars, readiness probe
-- [ ] T011 [P] [US1] Create inventory-service Service in `apisix-k8s/inventory-service/service.yaml` — ClusterIP, port 8083
-- [ ] T012 [P] [US1] Create payment-service Deployment in `apisix-k8s/payment-service/deployment.yaml` — image `payment-service:latest`, port 8084, OTel env vars, readiness probe
-- [ ] T013 [P] [US1] Create payment-service Service in `apisix-k8s/payment-service/service.yaml` — ClusterIP, port 8084
-- [ ] T014 [P] [US1] Create notification-service Deployment in `apisix-k8s/notification-service/deployment.yaml` — image `notification-service:latest`, port 8085, OTel env vars, SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092, readiness probe
-- [ ] T015 [P] [US1] Create notification-service Service in `apisix-k8s/notification-service/service.yaml` — ClusterIP, port 8085
+- [x] T008 [P] [US1] Create product-service Deployment in `apisix-k8s/product-service/deployment.yaml` — image `product-service:latest`, port 8082, OTel env vars (JAVA_TOOL_OPTIONS, OTEL_SERVICE_NAME=product-service, OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317), readiness probe on `/h2-console`
+- [x] T009 [P] [US1] Create product-service Service in `apisix-k8s/product-service/service.yaml` — ClusterIP, port 8082
+- [x] T010 [P] [US1] Create inventory-service Deployment in `apisix-k8s/inventory-service/deployment.yaml` — image `inventory-service:latest`, port 8083, OTel env vars, readiness probe
+- [x] T011 [P] [US1] Create inventory-service Service in `apisix-k8s/inventory-service/service.yaml` — ClusterIP, port 8083
+- [x] T012 [P] [US1] Create payment-service Deployment in `apisix-k8s/payment-service/deployment.yaml` — image `payment-service:latest`, port 8084, OTel env vars, readiness probe
+- [x] T013 [P] [US1] Create payment-service Service in `apisix-k8s/payment-service/service.yaml` — ClusterIP, port 8084
+- [x] T014 [P] [US1] Create notification-service Deployment in `apisix-k8s/notification-service/deployment.yaml` — image `notification-service:latest`, port 8085, OTel env vars, SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092, readiness probe
+- [x] T015 [P] [US1] Create notification-service Service in `apisix-k8s/notification-service/service.yaml` — ClusterIP, port 8085
 
 ### Blue/Green Order Service Deployments
 
-- [ ] T016 [P] [US1] Create order-service-blue Deployment in `apisix-k8s/order-service-blue/deployment.yaml` — image `order-service:latest`, port 8081, labels `version: blue`, env: OTEL_SERVICE_NAME=order-service-blue, APP_VERSION=v1-blue, PRODUCT_SERVICE_URL=http://product-service:8082, INVENTORY_SERVICE_URL=http://inventory-service:8083, PAYMENT_SERVICE_URL=http://payment-service:8084, SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092, readiness probe
-- [ ] T017 [P] [US1] Create order-service-blue Service in `apisix-k8s/order-service-blue/service.yaml` — ClusterIP, port 8081, selector `version: blue`
-- [ ] T018 [P] [US1] Create order-service-green Deployment in `apisix-k8s/order-service-green/deployment.yaml` — identical to Blue except: labels `version: green`, OTEL_SERVICE_NAME=order-service-green, APP_VERSION=v2-green
-- [ ] T019 [P] [US1] Create order-service-green Service in `apisix-k8s/order-service-green/service.yaml` — ClusterIP, port 8081, selector `version: green`
+- [x] T016 [P] [US1] Create order-service-blue Deployment in `apisix-k8s/order-service-blue/deployment.yaml` — image `order-service:latest`, port 8081, labels `version: blue`, env: OTEL_SERVICE_NAME=order-service-blue, APP_VERSION=v1-blue, PRODUCT_SERVICE_URL=http://product-service:8082, INVENTORY_SERVICE_URL=http://inventory-service:8083, PAYMENT_SERVICE_URL=http://payment-service:8084, SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092, readiness probe
+- [x] T017 [P] [US1] Create order-service-blue Service in `apisix-k8s/order-service-blue/service.yaml` — ClusterIP, port 8081, selector `version: blue`
+- [x] T018 [P] [US1] Create order-service-green Deployment in `apisix-k8s/order-service-green/deployment.yaml` — identical to Blue except: labels `version: green`, OTEL_SERVICE_NAME=order-service-green, APP_VERSION=v2-green
+- [x] T019 [P] [US1] Create order-service-green Service in `apisix-k8s/order-service-green/service.yaml` — ClusterIP, port 8081, selector `version: green`
 
 ### APISIX Helm Values & Config
 
-- [ ] T020 [US1] Create APISIX Helm values in `apisix-k8s/apisix-values.yaml` — image `apache/apisix:3.9.1-debian`, gateway NodePort 30080, admin NodePort 30180 with key `poc-admin-key-2024`, allow `0.0.0.0/0`, plugins list (traffic-split, proxy-rewrite, response-rewrite, opentelemetry), pluginAttrs.opentelemetry with collector `jaeger.ecommerce.svc.cluster.local:4318`, etcd 1 replica no persistence, dashboard disabled, ingressController disabled
-- [ ] T021 [P] [US1] Create Blue upstream JSON in `apisix-k8s/apisix-config/upstreams.json` — upstream id=1 (order-blue-v1) and upstream id=2 (order-green-v2) per contracts/apisix-admin-api.md, K8s DNS nodes, health checks, timeouts
-- [ ] T022 [P] [US1] Create order API route JSON in `apisix-k8s/apisix-config/route.json` — route id=1 with uri `/api/*`, upstream_id=1 (Blue default), traffic-split plugin with Rule 1 (X-Canary header match → Green 100%) and Rule 2 (weighted split, initial: Green 0 / Blue 100) per contracts/apisix-admin-api.md
-- [ ] T023 [P] [US1] Create admin endpoint routes in `apisix-k8s/apisix-config/route.json` — add upstream id=3 (payment-service:8084), upstream id=4 (notification-service:8085), route id=2 (payment-admin `/payment/*` with proxy-rewrite), route id=3 (notification-admin `/notification/*` with proxy-rewrite) per contracts/apisix-admin-api.md
+- [x] T020 [US1] Create APISIX Helm values in `apisix-k8s/apisix-values.yaml` — image `apache/apisix:3.9.1-debian`, gateway NodePort 30080, admin NodePort 30180 with key `poc-admin-key-2024`, allow `0.0.0.0/0`, plugins list (traffic-split, proxy-rewrite, response-rewrite, opentelemetry), pluginAttrs.opentelemetry with collector `jaeger.ecommerce.svc.cluster.local:4318`, etcd 1 replica no persistence, dashboard disabled, ingressController disabled
+- [x] T021 [P] [US1] Create Blue upstream JSON in `apisix-k8s/apisix-config/upstreams.json` — upstream id=1 (order-blue-v1) and upstream id=2 (order-green-v2) per contracts/apisix-admin-api.md, K8s DNS nodes, health checks, timeouts
+- [x] T022 [P] [US1] Create order API route JSON in `apisix-k8s/apisix-config/route.json` — route id=1 with uri `/api/*`, upstream_id=1 (Blue default), traffic-split plugin with Rule 1 (X-Canary header match → Green 100%) and Rule 2 (weighted split, initial: Green 0 / Blue 100) per contracts/apisix-admin-api.md
+- [x] T023 [P] [US1] Create admin endpoint routes in `apisix-k8s/apisix-config/route.json` — add upstream id=3 (payment-service:8084), upstream id=4 (notification-service:8085), route id=2 (payment-admin `/payment/*` with proxy-rewrite), route id=3 (notification-admin `/notification/*` with proxy-rewrite) per contracts/apisix-admin-api.md
 
 ### Traffic Control Script
 
-- [ ] T024 [US1] Create traffic control script `scripts/apisix-traffic.sh` — subcommands: `blue` (100/0), `canary` (90/10), `split` (50/50), `green` (0/100), `status` (GET route config and parse weights). Each subcommand sends PATCH to `http://localhost:9180/apisix/admin/routes/1` with traffic-split plugin JSON per contracts. Include Admin API reachability check, error handling, and color-coded output.
+- [x] T024 [US1] Create traffic control script `scripts/apisix-traffic.sh` — subcommands: `blue` (100/0), `canary` (90/10), `split` (50/50), `green` (0/100), `status` (GET route config and parse weights). Each subcommand sends PATCH to `http://localhost:9180/apisix/admin/routes/1` with traffic-split plugin JSON per contracts. Include Admin API reachability check, error handling, and color-coded output.
 
 **Checkpoint**: Blue/Green order-service manifests + APISIX config + traffic script ready. With deploy script (US5), US1 acceptance scenarios can be validated.
 
@@ -85,8 +85,8 @@
 
 **Independent Test**: Run `scripts/apisix-deploy.sh` on a clean machine with prerequisites, verify all pods reach Ready within 6 minutes and `curl http://localhost:9080/api/orders` returns a valid response. Then run `scripts/apisix-teardown.sh` and verify cluster is removed.
 
-- [ ] T025 [US5] Create deployment script `scripts/apisix-deploy.sh` — prerequisite checks (docker, kind, kubectl, helm, jq), detect existing cluster `apisix-ecommerce`, create Kind cluster from `apisix-k8s/kind-config.yaml`, create `ecommerce` namespace, build 5 Docker images (order-service, product-service, inventory-service, payment-service, notification-service) and load into Kind, deploy Kafka + Jaeger manifests and wait for ready, deploy all microservice manifests and wait for ready, `helm repo add apisix` + `helm install` with `apisix-k8s/apisix-values.yaml`, wait for APISIX gateway + etcd ready, configure upstreams/routes/global-rules via Admin API curl using JSONs from `apisix-k8s/apisix-config/`, final verification (all pods ready, gateway responds, Jaeger UI accessible), print summary with endpoint URLs
-- [ ] T026 [US5] Create teardown script `scripts/apisix-teardown.sh` — delete Kind cluster `apisix-ecommerce`, verify removal, print confirmation message
+- [x] T025 [US5] Create deployment script `scripts/apisix-deploy.sh` — prerequisite checks (docker, kind, kubectl, helm, jq), detect existing cluster `apisix-ecommerce`, create Kind cluster from `apisix-k8s/kind-config.yaml`, create `ecommerce` namespace, build 5 Docker images (order-service, product-service, inventory-service, payment-service, notification-service) and load into Kind, deploy Kafka + Jaeger manifests and wait for ready, deploy all microservice manifests and wait for ready, `helm repo add apisix` + `helm install` with `apisix-k8s/apisix-values.yaml`, wait for APISIX gateway + etcd ready, configure upstreams/routes/global-rules via Admin API curl using JSONs from `apisix-k8s/apisix-config/`, final verification (all pods ready, gateway responds, Jaeger UI accessible), print summary with endpoint URLs
+- [x] T026 [US5] Create teardown script `scripts/apisix-teardown.sh` — delete Kind cluster `apisix-ecommerce`, verify removal, print confirmation message
 
 **Checkpoint**: `apisix-deploy.sh` + `apisix-teardown.sh` ready. Combined with Phase 3, the full MVP (US1 + US5) is functional — deploy environment, switch traffic, verify distribution.
 
@@ -98,7 +98,7 @@
 
 **Independent Test**: With 100% Blue configured, send a request with `-H "X-Canary: true"` and verify it reaches Green (check Jaeger for `order-service-green`). Send a request without the header and verify it reaches Blue.
 
-- [ ] T027 [US2] Add `header` subcommand to `scripts/apisix-traffic.sh` — enables combined configuration: Rule 1 (X-Canary header match → Green 100%) is always present in all traffic-split configurations. The `header` subcommand explicitly sets 100% Blue for non-header traffic + X-Canary → Green, clearly documenting header-based routing is active. Verify by sending a test request with header and confirming Green response.
+- [x] T027 [US2] Add `header` subcommand to `scripts/apisix-traffic.sh` — enables combined configuration: Rule 1 (X-Canary header match → Green 100%) is always present in all traffic-split configurations. The `header` subcommand explicitly sets 100% Blue for non-header traffic + X-Canary → Green, clearly documenting header-based routing is active. Verify by sending a test request with header and confirming Green response.
 
 **Checkpoint**: Header-based routing functional. QA can test Green version independently via `X-Canary: true` header while all other traffic goes to Blue.
 
@@ -110,7 +110,7 @@
 
 **Independent Test**: Configure 100% Green (`apisix-traffic.sh green`), then run `apisix-traffic.sh rollback`, send 10 requests and verify all go to Blue.
 
-- [ ] T028 [US3] Add `rollback` subcommand to `scripts/apisix-traffic.sh` — sends PATCH to set traffic-split weights to Green 0 / Blue 100 (same as `blue` subcommand but with explicit "ROLLBACK" messaging and confirmation output). Include validation that rollback was successful by querying route status after PATCH.
+- [x] T028 [US3] Add `rollback` subcommand to `scripts/apisix-traffic.sh` — sends PATCH to set traffic-split weights to Green 0 / Blue 100 (same as `blue` subcommand but with explicit "ROLLBACK" messaging and confirmation output). Include validation that rollback was successful by querying route status after PATCH.
 
 **Checkpoint**: Rollback functional. Operator can instantly revert from any traffic configuration (canary, 50/50, full Green) to 100% Blue.
 
@@ -122,8 +122,8 @@
 
 **Independent Test**: Send an order request through APISIX, open Jaeger UI, find the trace, and verify it includes an APISIX span plus all 5 downstream service spans.
 
-- [ ] T029 [US4] Create OpenTelemetry global rule JSON in `apisix-k8s/apisix-config/global-rules.json` — OpenTelemetry plugin with sampler `always_on` per contracts/apisix-admin-api.md contract #8
-- [ ] T030 [US4] Create test & verification script `scripts/apisix-test.sh` — subcommands: `all` (run all 5 test scenarios through gateway port 9080), `verify-distribution` (send 100 requests, count Blue vs Green by checking Jaeger traces for service name), `verify-traces` (send 1 order request, query Jaeger API for trace, verify APISIX span exists in the trace alongside order/product/inventory/payment/notification spans). Include: Scenario 1 Happy Path, Scenario 2 Inventory Shortage (P999/qty 999), Scenario 3 Payment Timeout (simulate-delay + order), Scenario 4 Kafka Async (same as S1, verify notification-service span), Scenario 5 Kafka DLT (simulate-failure + order + wait + disable). Color-coded pass/fail output per scenario.
+- [x] T029 [US4] Create OpenTelemetry global rule JSON in `apisix-k8s/apisix-config/global-rules.json` — OpenTelemetry plugin with sampler `always_on` per contracts/apisix-admin-api.md contract #8
+- [x] T030 [US4] Create test & verification script `scripts/apisix-test.sh` — subcommands: `all` (run all 5 test scenarios through gateway port 9080), `verify-distribution` (send 100 requests, count Blue vs Green by checking Jaeger traces for service name), `verify-traces` (send 1 order request, query Jaeger API for trace, verify APISIX span exists in the trace alongside order/product/inventory/payment/notification spans). Include: Scenario 1 Happy Path, Scenario 2 Inventory Shortage (P999/qty 999), Scenario 3 Payment Timeout (simulate-delay + order), Scenario 4 Kafka Async (same as S1, verify notification-service span), Scenario 5 Kafka DLT (simulate-failure + order + wait + disable). Color-coded pass/fail output per scenario.
 
 **Checkpoint**: Full distributed tracing validated through APISIX gateway. All 5 test scenarios produce complete Jaeger traces.
 
@@ -133,9 +133,9 @@
 
 **Purpose**: Documentation, final validation, and cleanup.
 
-- [ ] T031 [P] Create feature README in `apisix-k8s/README.md` — architecture overview with ASCII/mermaid diagram showing APISIX → Blue/Green → downstream services → Jaeger, prerequisites table, quickstart section (deploy → traffic operations → test → teardown), traffic scenarios reference table (100/0, 90/10, 50/50, 0/100, header, rollback), APISIX Admin API reference with curl examples, troubleshooting guide (common issues: pods not ready, Admin API unreachable, port conflicts)
-- [ ] T032 Validate quickstart.md against actual deployment — run through all steps in `specs/003-apisix-blue-green/quickstart.md` on the deployed environment, fix any discrepancies
-- [ ] T033 End-to-end validation — run `scripts/apisix-deploy.sh`, execute `scripts/apisix-test.sh all`, run each traffic scenario (`blue`, `canary`, `split`, `green`, `header`, `rollback`), verify `scripts/apisix-test.sh verify-distribution` for canary (90/10), run `scripts/apisix-teardown.sh`, confirm all success criteria (SC-001 through SC-006)
+- [x] T031 [P] Create feature README in `apisix-k8s/README.md` — architecture overview with ASCII/mermaid diagram showing APISIX → Blue/Green → downstream services → Jaeger, prerequisites table, quickstart section (deploy → traffic operations → test → teardown), traffic scenarios reference table (100/0, 90/10, 50/50, 0/100, header, rollback), APISIX Admin API reference with curl examples, troubleshooting guide (common issues: pods not ready, Admin API unreachable, port conflicts)
+- [ ] T032 Validate quickstart.md against actual deployment — run through all steps in `specs/003-apisix-blue-green/quickstart.md` on the deployed environment, fix any discrepancies *(requires Docker/Kind runtime)*
+- [ ] T033 End-to-end validation — run `scripts/apisix-deploy.sh`, execute `scripts/apisix-test.sh all`, run each traffic scenario (`blue`, `canary`, `split`, `green`, `header`, `rollback`), verify `scripts/apisix-test.sh verify-distribution` for canary (90/10), run `scripts/apisix-teardown.sh`, confirm all success criteria (SC-001 through SC-006) *(requires Docker/Kind runtime)*
 
 ---
 
