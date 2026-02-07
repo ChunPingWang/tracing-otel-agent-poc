@@ -29,6 +29,36 @@ services:
     networks:
       - ecommerce-net
 
+  prometheus:
+    image: prom/prometheus:v3.5.1
+    command:
+      - "--web.enable-otlp-receiver"
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - ecommerce-net
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_BASIC_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - ecommerce-net
+
   order-service:
     build:
       context: ./order-service
@@ -39,8 +69,10 @@ services:
       JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
       OTEL_SERVICE_NAME: order-service
       OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
-      OTEL_METRICS_EXPORTER: none
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
       OTEL_LOGS_EXPORTER: none
       PRODUCT_SERVICE_URL: http://product-service:8082
       INVENTORY_SERVICE_URL: http://inventory-service:8083
@@ -49,6 +81,7 @@ services:
     depends_on:
       - jaeger
       - kafka
+      - prometheus
       - product-service
       - inventory-service
       - payment-service
@@ -65,11 +98,14 @@ services:
       JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
       OTEL_SERVICE_NAME: product-service
       OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
-      OTEL_METRICS_EXPORTER: none
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
       OTEL_LOGS_EXPORTER: none
     depends_on:
       - jaeger
+      - prometheus
     networks:
       - ecommerce-net
 
@@ -83,11 +119,14 @@ services:
       JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
       OTEL_SERVICE_NAME: inventory-service
       OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
-      OTEL_METRICS_EXPORTER: none
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
       OTEL_LOGS_EXPORTER: none
     depends_on:
       - jaeger
+      - prometheus
     networks:
       - ecommerce-net
 
@@ -101,11 +140,14 @@ services:
       JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
       OTEL_SERVICE_NAME: payment-service
       OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
-      OTEL_METRICS_EXPORTER: none
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
       OTEL_LOGS_EXPORTER: none
     depends_on:
       - jaeger
+      - prometheus
     networks:
       - ecommerce-net
 
@@ -119,13 +161,16 @@ services:
       JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
       OTEL_SERVICE_NAME: notification-service
       OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
-      OTEL_METRICS_EXPORTER: none
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
       OTEL_LOGS_EXPORTER: none
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - jaeger
       - kafka
+      - prometheus
     networks:
       - ecommerce-net
 
