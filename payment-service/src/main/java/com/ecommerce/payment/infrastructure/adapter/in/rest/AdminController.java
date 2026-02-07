@@ -1,0 +1,23 @@
+package com.ecommerce.payment.infrastructure.adapter.in.rest;
+
+import com.ecommerce.payment.infrastructure.config.DelaySimulatorConfig;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class AdminController {
+
+    private final DelaySimulatorConfig delayConfig;
+
+    public AdminController(DelaySimulatorConfig delayConfig) {
+        this.delayConfig = delayConfig;
+    }
+
+    @PostMapping("/api/admin/simulate-delay")
+    public ResponseEntity<String> simulateDelay(@RequestParam("ms") int ms) {
+        delayConfig.setDelayMs(ms);
+        return ResponseEntity.ok("Delay set to " + ms + "ms");
+    }
+}

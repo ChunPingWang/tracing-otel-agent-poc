@@ -26,4 +26,15 @@ public class PaymentControllerIntegrationTest {
                 .andExpect(jsonPath("$.paymentId").isNotEmpty())
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
     }
+
+    @Test
+    void should_set_and_clear_delay_simulation() throws Exception {
+        // Set delay to 5000ms
+        mockMvc.perform(post("/api/admin/simulate-delay?ms=5000"))
+                .andExpect(status().isOk());
+
+        // Clear delay
+        mockMvc.perform(post("/api/admin/simulate-delay?ms=0"))
+                .andExpect(status().isOk());
+    }
 }

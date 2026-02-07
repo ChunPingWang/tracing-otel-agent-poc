@@ -4,6 +4,7 @@ import com.ecommerce.order.application.dto.CreateOrderCommand;
 import com.ecommerce.order.application.dto.CreateOrderResult;
 import com.ecommerce.order.application.dto.OrderItemCommand;
 import com.ecommerce.order.application.port.in.CreateOrderPort;
+import com.ecommerce.order.application.port.out.InventoryReleasePort;
 import com.ecommerce.order.application.port.out.InventoryReservePort;
 import com.ecommerce.order.application.port.out.OrderEventPublisherPort;
 import com.ecommerce.order.application.port.out.PaymentPort;
@@ -15,6 +16,7 @@ import com.ecommerce.order.domain.model.OrderItem;
 import com.ecommerce.order.domain.port.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +28,20 @@ public class CreateOrderUseCase implements CreateOrderPort {
 
     private final ProductQueryPort productQueryPort;
     private final InventoryReservePort inventoryReservePort;
+    private final InventoryReleasePort inventoryReleasePort;
     private final PaymentPort paymentPort;
     private final OrderRepository orderRepository;
     private final OrderEventPublisherPort orderEventPublisherPort;
 
     public CreateOrderUseCase(ProductQueryPort productQueryPort,
                               InventoryReservePort inventoryReservePort,
+                              InventoryReleasePort inventoryReleasePort,
                               PaymentPort paymentPort,
                               OrderRepository orderRepository,
                               OrderEventPublisherPort orderEventPublisherPort) {
         this.productQueryPort = productQueryPort;
         this.inventoryReservePort = inventoryReservePort;
+        this.inventoryReleasePort = inventoryReleasePort;
         this.paymentPort = paymentPort;
         this.orderRepository = orderRepository;
         this.orderEventPublisherPort = orderEventPublisherPort;
@@ -49,15 +54,34 @@ public class CreateOrderUseCase implements CreateOrderPort {
         Order order = Order.create(orderId, command.getCustomerId(), orderItems);
         order = orderRepository.save(order);
 
-        reserveInventoryForItems(command.getItems());
-        processPaymentAndConfirm(order);
-        order = orderRepository.save(order);
+        try {
+            reserveInventoryForItems(command.getItems());
+        } catch (RuntimeException e) {
+            return handleInventoryFailure(order);
+        }
 
-        return new CreateOrderResult(
-                order.getOrderId(),
-                order.getStatus().name(),
-                order.getTotalAmount()
-        );
+        try {
+            processPaymentAndConfirm(order);
+        } catch (ResourceAccessException e) {
+            return handlePaymentTimeout(order, command.getItems());
+        }
+
+        order = orderRepository.save(order);
+        return toResult(order);
+    }
+
+    private CreateOrderResult handleInventoryFailure(Order order) {
+        order.fail();
+        order = orderRepository.save(order);
+        return toResult(order);
+    }
+
+    private CreateOrderResult handlePaymentTimeout(Order order,
+                                                   List<OrderItemCommand> items) {
+        releaseInventoryForItems(items);
+        order.paymentTimeout();
+        order = orderRepository.save(order);
+        return toResult(order);
     }
 
     private List<OrderItem> queryProductsAndBuildItems(List<OrderItemCommand> itemCommands) {
@@ -80,12 +104,27 @@ public class CreateOrderUseCase implements CreateOrderPort {
         }
     }
 
+    private void releaseInventoryForItems(List<OrderItemCommand> itemCommands) {
+        for (OrderItemCommand itemCmd : itemCommands) {
+            inventoryReleasePort.releaseInventory(
+                    itemCmd.getProductId(), itemCmd.getQuantity());
+        }
+    }
+
     private void processPaymentAndConfirm(Order order) {
         PaymentResult paymentResult = paymentPort.processPayment(
                 order.getOrderId(), order.getTotalAmount());
         if (paymentResult.isSuccess()) {
             order.confirm();
         }
+    }
+
+    private CreateOrderResult toResult(Order order) {
+        return new CreateOrderResult(
+                order.getOrderId(),
+                order.getStatus().name(),
+                order.getTotalAmount()
+        );
     }
 
     private String generateOrderId() {

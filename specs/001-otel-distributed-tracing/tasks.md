@@ -158,19 +158,19 @@
 
 ### Tests for User Story 2 (TDD)
 
-- [ ] T074 [P] [US2] Write unit test for CreateOrderUseCase (inventory insufficient scenario: status=FAILED, no payment call) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
-- [ ] T075 [P] [US2] Write unit test for CreateOrderUseCase (payment timeout scenario: status=PAYMENT_TIMEOUT, inventory release called) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
-- [ ] T076 [P] [US2] Write unit test for InventoryDomainService (insufficient stock throws domain exception) in inventory-service/src/test/java/com/ecommerce/inventory/domain/service/InventoryDomainServiceTest.java
-- [ ] T077 [P] [US2] Write integration test for OrderController (inventory insufficient scenario) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java (add test method)
-- [ ] T078 [P] [US2] Write integration test for PaymentController delay simulation endpoint (POST /api/admin/simulate-delay) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java (add test method)
+- [x] T074 [P] [US2] Write unit test for CreateOrderUseCase (inventory insufficient scenario: status=FAILED, no payment call) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
+- [x] T075 [P] [US2] Write unit test for CreateOrderUseCase (payment timeout scenario: status=PAYMENT_TIMEOUT, inventory release called) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java (add test method)
+- [x] T076 [P] [US2] Write unit test for InventoryDomainService (insufficient stock throws domain exception) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java (已由 InventoryTest.should_throw_when_insufficient_stock 涵蓋)
+- [x] T077 [P] [US2] Write integration test for OrderController (inventory insufficient scenario) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java (add test method)
+- [x] T078 [P] [US2] Write integration test for PaymentController delay simulation endpoint (POST /api/admin/simulate-delay) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java (add test method)
 
 ### Implementation for User Story 2
 
-- [ ] T079 [US2] Implement InsufficientStockException in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/InsufficientStockException.java and wire into InventoryDomainService
-- [ ] T080 [US2] Add inventory insufficient error handling in CreateOrderUseCase: catch exception → set order status FAILED → skip payment call in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T081 [US2] Add payment timeout handling in CreateOrderUseCase: catch ResourceAccessException → call inventory release → set order status PAYMENT_TIMEOUT in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T082 [US2] Implement ReleaseInventoryUseCase in inventory-service/src/main/java/com/ecommerce/inventory/application/service/ReleaseInventoryUseCase.java
-- [ ] T083 [US2] Implement DelaySimulatorConfig and AdminController (POST /api/admin/simulate-delay?ms=) in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
+- [x] T079 [US2] Implement InsufficientStockException in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/InsufficientStockException.java and wire into InventoryDomainService (已於 Phase 2 完成)
+- [x] T080 [US2] Add inventory insufficient error handling in CreateOrderUseCase: catch exception → set order status FAILED → skip payment call in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T081 [US2] Add payment timeout handling in CreateOrderUseCase: catch ResourceAccessException → call inventory release → set order status PAYMENT_TIMEOUT in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T082 [US2] Implement ReleaseInventoryUseCase in inventory-service/src/main/java/com/ecommerce/inventory/application/service/ReleaseInventoryUseCase.java (已於 Phase 3 完成)
+- [x] T083 [US2] Implement DelaySimulatorConfig and AdminController (POST /api/admin/simulate-delay?ms=) in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
 
 **Checkpoint**: 庫存不足與支付超時場景可正確處理。Jaeger 中可看到 error 標記與長延遲 Span。
 

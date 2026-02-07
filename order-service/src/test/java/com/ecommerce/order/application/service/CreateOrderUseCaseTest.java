@@ -3,6 +3,7 @@ package com.ecommerce.order.application.service;
 import com.ecommerce.order.application.dto.CreateOrderCommand;
 import com.ecommerce.order.application.dto.CreateOrderResult;
 import com.ecommerce.order.application.dto.OrderItemCommand;
+import com.ecommerce.order.application.port.out.InventoryReleasePort;
 import com.ecommerce.order.application.port.out.InventoryReservePort;
 import com.ecommerce.order.application.port.out.OrderEventPublisherPort;
 import com.ecommerce.order.application.port.out.PaymentPort;
@@ -15,6 +16,7 @@ import com.ecommerce.order.domain.port.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ public class CreateOrderUseCaseTest {
 
     private ProductQueryPort productQueryPort;
     private InventoryReservePort inventoryReservePort;
+    private InventoryReleasePort inventoryReleasePort;
     private PaymentPort paymentPort;
     private OrderRepository orderRepository;
     private OrderEventPublisherPort orderEventPublisherPort;
@@ -36,12 +39,14 @@ public class CreateOrderUseCaseTest {
     void setUp() {
         productQueryPort = mock(ProductQueryPort.class);
         inventoryReservePort = mock(InventoryReservePort.class);
+        inventoryReleasePort = mock(InventoryReleasePort.class);
         paymentPort = mock(PaymentPort.class);
         orderRepository = mock(OrderRepository.class);
         orderEventPublisherPort = mock(OrderEventPublisherPort.class);
         createOrderUseCase = new CreateOrderUseCase(
                 productQueryPort,
                 inventoryReservePort,
+                inventoryReleasePort,
                 paymentPort,
                 orderRepository,
                 orderEventPublisherPort
@@ -140,5 +145,72 @@ public class CreateOrderUseCaseTest {
         assertEquals(2, savedStatuses.size());
         assertEquals(OrderStatus.CREATED, savedStatuses.get(0));
         assertEquals(OrderStatus.CONFIRMED, savedStatuses.get(1));
+    }
+
+    @Test
+    void should_fail_order_when_inventory_insufficient() {
+        // Given
+        when(productQueryPort.queryProduct("P001"))
+                .thenReturn(new ProductInfo("P001", "Laptop", new BigDecimal("999.00")));
+        when(inventoryReservePort.reserveInventory("P001", 2))
+                .thenThrow(new RuntimeException("409 Conflict: Inventory insufficient"));
+
+        java.util.List<OrderStatus> savedStatuses = new java.util.ArrayList<>();
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> {
+                    Order o = invocation.getArgument(0);
+                    savedStatuses.add(o.getStatus());
+                    return o;
+                });
+
+        CreateOrderCommand command = new CreateOrderCommand("C001",
+                Arrays.asList(new OrderItemCommand("P001", 2)));
+
+        // When
+        CreateOrderResult result = createOrderUseCase.createOrder(command);
+
+        // Then
+        assertEquals("FAILED", result.getStatus());
+        verify(paymentPort, never()).processPayment(anyString(), any(BigDecimal.class));
+        assertEquals(2, savedStatuses.size());
+        assertEquals(OrderStatus.CREATED, savedStatuses.get(0));
+        assertEquals(OrderStatus.FAILED, savedStatuses.get(1));
+    }
+
+    @Test
+    void should_timeout_order_and_release_inventory_when_payment_times_out() {
+        // Given
+        when(productQueryPort.queryProduct("P001"))
+                .thenReturn(new ProductInfo("P001", "Laptop", new BigDecimal("999.00")));
+        when(productQueryPort.queryProduct("P002"))
+                .thenReturn(new ProductInfo("P002", "Mouse", new BigDecimal("29.00")));
+        when(inventoryReservePort.reserveInventory(anyString(), anyInt())).thenReturn(true);
+        when(paymentPort.processPayment(anyString(), any(BigDecimal.class)))
+                .thenThrow(new ResourceAccessException("Read timed out"));
+
+        java.util.List<OrderStatus> savedStatuses = new java.util.ArrayList<>();
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> {
+                    Order o = invocation.getArgument(0);
+                    savedStatuses.add(o.getStatus());
+                    return o;
+                });
+
+        CreateOrderCommand command = new CreateOrderCommand("C001",
+                Arrays.asList(
+                        new OrderItemCommand("P001", 1),
+                        new OrderItemCommand("P002", 3)
+                ));
+
+        // When
+        CreateOrderResult result = createOrderUseCase.createOrder(command);
+
+        // Then
+        assertEquals("PAYMENT_TIMEOUT", result.getStatus());
+        verify(inventoryReleasePort).releaseInventory("P001", 1);
+        verify(inventoryReleasePort).releaseInventory("P002", 3);
+        assertEquals(2, savedStatuses.size());
+        assertEquals(OrderStatus.CREATED, savedStatuses.get(0));
+        assertEquals(OrderStatus.PAYMENT_TIMEOUT, savedStatuses.get(1));
     }
 }

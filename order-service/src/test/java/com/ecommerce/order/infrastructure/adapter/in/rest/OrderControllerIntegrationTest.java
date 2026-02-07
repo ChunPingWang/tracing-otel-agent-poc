@@ -1,5 +1,6 @@
 package com.ecommerce.order.infrastructure.adapter.in.rest;
 
+import com.ecommerce.order.application.port.out.InventoryReleasePort;
 import com.ecommerce.order.application.port.out.InventoryReservePort;
 import com.ecommerce.order.application.port.out.OrderEventPublisherPort;
 import com.ecommerce.order.application.port.out.PaymentPort;
@@ -33,6 +34,9 @@ public class OrderControllerIntegrationTest {
 
     @MockBean
     private InventoryReservePort inventoryReservePort;
+
+    @MockBean
+    private InventoryReleasePort inventoryReleasePort;
 
     @MockBean
     private PaymentPort paymentPort;
@@ -88,5 +92,26 @@ public class OrderControllerIntegrationTest {
                 .andExpect(jsonPath("$.orderId").isNotEmpty())
                 .andExpect(jsonPath("$.status").value("CONFIRMED"))
                 .andExpect(jsonPath("$.totalAmount").value(1028.00));
+    }
+
+    @Test
+    void should_return_failed_status_when_inventory_insufficient() throws Exception {
+        // Given
+        when(productQueryPort.queryProduct("P001"))
+                .thenReturn(new ProductInfo("P001", "Laptop", new BigDecimal("999.00")));
+        when(inventoryReservePort.reserveInventory("P001", 2))
+                .thenThrow(new RuntimeException("409 Conflict: Inventory insufficient"));
+
+        String requestJson = "{\"customerId\":\"C001\","
+                + "\"items\":[{\"productId\":\"P001\",\"quantity\":2}]}";
+
+        // When & Then
+        mockMvc.perform(post("/api/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").isNotEmpty())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.totalAmount").value(1998.00));
     }
 }
