@@ -1058,7 +1058,7 @@ erDiagram
 
 | 元件 | 技術 | 版本 | 說明 |
 |------|------|------|------|
-| Runtime | OpenJDK | 8 | 既有環境限制 |
+| Runtime | Eclipse Temurin | 8 | OpenJDK 發行版（Docker 映像檔使用 `eclipse-temurin:8-jre`） |
 | Framework | Spring Boot | 2.7.18 | 最後的 2.x 穩定版 |
 | HTTP Client | RestTemplate | Spring Boot 内建 | 服務間同步呼叫 |
 | Messaging | Spring Kafka | 2.9.x | 非同步事件驅動通訊 |
