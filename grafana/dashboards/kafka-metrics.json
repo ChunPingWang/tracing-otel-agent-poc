@@ -10,6 +10,29 @@
     "from": "now-15m",
     "to": "now"
   },
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus"
+        },
+        "query": "label_values(kafka_producer_record_send_total, service_name)",
+        "definition": "label_values(kafka_producer_record_send_total, service_name)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "refresh": 1,
+        "sort": 1
+      }
+    ]
+  },
   "panels": [
     {
       "id": 1,
@@ -26,7 +49,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(kafka_producer_record_send_total[$__rate_interval])) by (service_name, topic)",
+          "expr": "sum(rate(kafka_producer_record_send_total{service_name=~\"$service\"}[$__rate_interval])) by (service_name, topic)",
           "legendFormat": "{{service_name}} → {{topic}}",
           "refId": "A"
         }
@@ -72,7 +95,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(kafka_consumer_records_consumed_total[$__rate_interval])) by (service_name, topic)",
+          "expr": "sum(rate(kafka_consumer_records_consumed_total{service_name=~\"$service\"}[$__rate_interval])) by (service_name, topic)",
           "legendFormat": "{{service_name}} ← {{topic}}",
           "refId": "A"
         }
@@ -118,7 +141,7 @@
       },
       "targets": [
         {
-          "expr": "sum(kafka_consumer_records_lag_max) by (service_name)",
+          "expr": "sum(kafka_consumer_records_lag_max{service_name=~\"$service\"}) by (service_name)",
           "legendFormat": "{{service_name}}",
           "refId": "A"
         }
@@ -164,7 +187,7 @@
       },
       "targets": [
         {
-          "expr": "kafka_producer_byte_rate{service_name!=\"\"}",
+          "expr": "kafka_producer_byte_rate{service_name=~\"$service\"}",
           "legendFormat": "{{service_name}}",
           "refId": "A"
         }
@@ -172,6 +195,98 @@
       "fieldConfig": {
         "defaults": {
           "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["mean", "lastNotNull", "max"]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "DLT Messages (send rate)",
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_producer_record_send_total{topic=~\".*\\\\.DLT\"}[$__rate_interval])) by (service_name, topic)",
+          "legendFormat": "{{service_name}} → {{topic}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["mean", "lastNotNull", "max"]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Consumer Lag by Topic",
+      "gridPos": {
+        "x": 12,
+        "y": 27,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "kafka_consumer_records_lag_max{service_name=~\"$service\"}",
+          "legendFormat": "{{service_name}} — {{topic}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",

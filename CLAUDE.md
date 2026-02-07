@@ -11,6 +11,7 @@ Auto-generated from all feature plans. Last updated: 2026-02-07
 - N/A (Grafana internal state for alert evaluation) (005-grafana-alert-rules)
 - YAML configuration (Grafana provisioning format, apiVersion: 1) + Grafana 11.6.0 (Unified Alerting), `mendhak/http-https-echo:39` (webhook receiver) (006-grafana-alert-notifications)
 - N/A (Grafana internal state for alert evaluation and notification delivery) (006-grafana-alert-notifications)
+- N/A — infrastructure-only (Grafana dashboard JSON, K8s YAML) + Grafana 11.6.0, Prometheus v3.5.1, OTel Java Agent 1.32.1 (007-enhance-grafana-dashboards)
 
 - Java 1.8 (OpenJDK 8) + Spring Boot 2.7.18, Spring Data JPA 2.7.x, Spring Kafka 2.9.x, H2 Database, OpenTelemetry Java Agent 1.32.1 (001-otel-distributed-tracing)
 
@@ -30,9 +31,9 @@ tests/
 Java 1.8 (OpenJDK 8): Follow standard conventions
 
 ## Recent Changes
+- 007-enhance-grafana-dashboards: Added N/A — infrastructure-only (Grafana dashboard JSON, K8s YAML) + Grafana 11.6.0, Prometheus v3.5.1, OTel Java Agent 1.32.1
 - 006-grafana-alert-notifications: Added YAML configuration (Grafana provisioning format, apiVersion: 1) + Grafana 11.6.0 (Unified Alerting), `mendhak/http-https-echo:39` (webhook receiver)
 - 005-grafana-alert-rules: Added YAML configuration (Grafana provisioning format, apiVersion: 1) + Grafana 11.6.0 (Unified Alerting), Prometheus (datasource)
-- 004-grafana-dashboard: Added Infrastructure-only feature (YAML, JSON, shell scripts). No Java code changes. + Prometheus v3.5.1 (LTS), Grafana 11.6.0, OpenTelemetry Java Agent 1.32.1 (existing)
 
 
 <!-- MANUAL ADDITIONS START -->

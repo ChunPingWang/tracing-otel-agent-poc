@@ -1103,7 +1103,7 @@ erDiagram
 | Tracing Agent | OpenTelemetry Java Agent | 1.32.1 | 最後支援 JDK 8 的版本 |
 | Tracing Backend | Jaeger | 1.53 (all-in-one) | OTLP 接收 + 追蹤 UI |
 | Metrics Backend | Prometheus | v3.5.1 (LTS) | Native OTLP Receiver（Push 模式，免 OTel Collector） |
-| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka）+ 4 條 Alert Rules + Webhook 告警通知 |
+| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health + Per-Endpoint 分析、JVM + Memory Pool、Kafka + DLT 監控）+ 4 條 Alert Rules + Webhook 告警通知 |
 | Alert Receiver | mendhak/http-https-echo | 39 | 輕量 Webhook 接收器（記錄 Grafana Alert 通知 payload 至 stdout） |
 | Container | Docker Compose | 最新穩定版 | 環境編排 |
 | Local K8s | Kind | v0.20+ | 本地 K8s 叢集 |
@@ -1171,7 +1171,7 @@ open http://localhost:16686
 
 # 6. 開啟 Grafana（監控儀表板，無需登入）
 open http://localhost:3000
-# 內建 3 個 Dashboard：Service Health Overview、JVM Metrics、Kafka Metrics
+# 內建 3 個 Dashboard：Service Health Overview（含 Per-Endpoint 分析）、JVM Metrics（含 Memory Pool）、Kafka Metrics（含 DLT 監控）
 # 內建 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
 # 內建 Webhook Contact Point + 嚴重等級路由 Notification Policy
 # 查看 Alert Rules：http://localhost:3000/alerting/list
@@ -1381,9 +1381,9 @@ tracing-otel-agent-poc/
 │   │       ├── contact-points.yaml # Webhook Contact Point（→ webhook-sink:8080）
 │   │       └── notification-policies.yaml # 嚴重等級路由（critical: 1m, warning: 5m）
 │   └── dashboards/                 # Dashboard JSON 定義
-│       ├── service-health.json     # 服務健康概覽（請求率、錯誤率、延遲百分位、DB 連線池）
-│       ├── jvm-metrics.json        # JVM 指標（Heap、GC、Thread）
-│       └── kafka-metrics.json      # Kafka 指標（Producer/Consumer 速率、Lag）
+│       ├── service-health.json     # 服務健康概覽（請求率、錯誤率、延遲百分位、DB 連線池、Per-Endpoint 請求率與 p95 延遲）
+│       ├── jvm-metrics.json        # JVM 指標（Heap、Non-Heap、GC、Thread、Memory Pool 細分、Class Loading）
+│       └── kafka-metrics.json      # Kafka 指標（Producer/Consumer 速率、Lag、DLT 訊息監控、Per-Topic Lag、服務篩選器）
 │
 ├── order-service/                  # 訂單編排服務 (Port 8081)
 │   ├── Dockerfile
