@@ -1,12 +1,66 @@
 # E-Commerce Distributed Tracing PoC — OpenTelemetry Java Agent
 
-> 使用 OpenTelemetry Java Agent **零侵入**方式，為 Spring Boot 2 / JDK 8 微服務導入分散式追蹤（Distributed Tracing），涵蓋同步 HTTP、非同步 Kafka、JDBC 三種通訊模式的端到端可觀測性。同時提供 **Apache APISIX 藍綠部署**方案，驗證 API Gateway 層的加權流量切換與追蹤透傳。
+> **一句話摘要：** 一個電子商務微服務 PoC，示範如何在**不改任何業務程式碼**的情況下，為 5 個 Spring Boot 微服務加上完整的分散式追蹤，並透過 API Gateway 實現藍綠部署。
+
+---
+
+## 這個專案在解決什麼問題？
+
+在微服務架構下，一個使用者請求（例如「下單」）會經過多個服務：
+
+```
+使用者按下「結帳」
+    → Order Service 接收請求
+        → Product Service 查商品價格
+        → Inventory Service 扣庫存
+        → Payment Service 扣款
+        → Kafka 發送事件 → Notification Service 發通知
+```
+
+**痛點：** 當某個環節出問題（延遲、錯誤），你無法快速知道是哪個服務造成的。
+
+**解法：** 透過 **OpenTelemetry Java Agent** 自動在每個服務間注入追蹤資訊（Trace），再用 **Jaeger UI** 視覺化整條呼叫鏈。整個過程**不需要修改任何業務程式碼** — 只需在啟動 JVM 時加上一個 `-javaagent` 參數。
+
+---
+
+## 你會學到什麼？
+
+| 主題 | 說明 |
+|------|------|
+| **分散式追蹤（Distributed Tracing）** | 如何追蹤一個請求在多個微服務之間的完整路徑 |
+| **OpenTelemetry Java Agent** | 零侵入式追蹤 — 不改程式碼即可自動攔截 HTTP、Kafka、JDBC |
+| **Jaeger** | 如何用 Jaeger UI 搜尋、分析、視覺化 Trace 資料 |
+| **藍綠部署（Blue-Green Deployment）** | 如何用 Apache APISIX 實現零停機的流量切換 |
+| **六角形架構（Hexagonal Architecture）** | 每個微服務的領域驅動設計與 Ports & Adapters 模式 |
+| **Kafka 非同步追蹤** | 同步 HTTP 與非同步 Kafka 如何串聯在同一條 Trace 中 |
+| **Kubernetes 部署** | 使用 Kind 在本地建立 K8s 叢集並部署微服務 |
+
+---
+
+## 關鍵概念術語表
+
+如果你是初次接觸分散式追蹤，以下術語表可以幫助你快速理解本文件：
+
+| 術語 | 英文 | 白話說明 |
+|------|------|----------|
+| **Trace** | Trace | 一個請求從頭到尾的完整記錄，橫跨多個服務 |
+| **Span** | Span | Trace 中的一個步驟。例如「Order Service 呼叫 Product Service」是一個 Span |
+| **TraceID** | Trace ID | 每條 Trace 的唯一識別碼，所有 Span 共用同一個 TraceID |
+| **Context Propagation** | 上下文傳播 | 把 TraceID 從 A 服務傳給 B 服務的機制（透過 HTTP Header 或 Kafka Header） |
+| **traceparent** | W3C traceparent | W3C 標準定義的 HTTP Header 格式：`00-<traceId>-<spanId>-01` |
+| **OTLP** | OpenTelemetry Protocol | OpenTelemetry 傳送 Trace 資料的標準協定（支援 gRPC 和 HTTP） |
+| **Java Agent** | Java Agent | JVM 啟動時載入的外掛，可在不改程式碼的情況下修改 class 行為 |
+| **藍綠部署** | Blue-Green Deployment | 同時維護兩套環境（Blue=舊版、Green=新版），透過流量切換實現零停機發布 |
+| **金絲雀發布** | Canary Release | 先將少量流量（如 10%）導向新版本，確認沒問題後再逐步擴大 |
+| **API Gateway** | API 閘道 | 所有外部請求的統一入口，負責路由、流量控制、追蹤透傳等 |
+| **DLT** | Dead Letter Topic | Kafka 消費失敗超過重試次數後，訊息被轉發到的「死信主題」 |
 
 ---
 
 ## 目錄
 
-- [專案簡介](#專案簡介)
+- [兩種部署模式比較](#兩種部署模式比較)
+- [業務場景 — 下單流程](#業務場景--下單流程)
 - [系統架構](#系統架構)
   - [Docker Compose 架構](#docker-compose-架構)
   - [APISIX 藍綠部署架構](#apisix-藍綠部署架構)
@@ -30,9 +84,48 @@
 
 ---
 
-## 專案簡介
+## 兩種部署模式比較
 
-本專案是一個**概念驗證（Proof of Concept）**，目標是驗證在不修改任何業務程式碼的前提下，透過 OpenTelemetry Java Agent 為既有的 Spring Boot 2 微服務系統導入完整的分散式追蹤能力。
+本專案提供兩種獨立的部署方式，你可以根據需求選擇其一：
+
+| | **Docker Compose** | **APISIX 藍綠部署 (Kind K8s)** |
+|---|---|---|
+| **適合場景** | 快速驗證分散式追蹤 | 驗證藍綠部署 + Gateway 追蹤透傳 |
+| **啟動指令** | `docker-compose up --build -d` | `./scripts/apisix-deploy.sh` |
+| **Order Service** | 1 個實例 | 2 個實例（Blue v1 + Green v2） |
+| **流量入口** | 直接存取 `:8081` | 經由 APISIX Gateway `:9080` |
+| **流量切換** | 無 | 支援（blue/canary/split/green/rollback） |
+| **運行環境** | Docker | Kind Kubernetes 叢集 |
+| **預估啟動時間** | ~1 分鐘 | ~5-6 分鐘 |
+| **前置工具** | Docker, JDK 8, Maven | Docker, Kind, kubectl, Helm, jq |
+
+---
+
+## 業務場景 — 下單流程
+
+在深入技術細節之前，先了解本 PoC 模擬的業務場景。這是一個簡化的電子商務下單流程，涉及 5 個微服務：
+
+```mermaid
+graph LR
+    A["1. 客戶下單"] --> B["2. 查詢商品價格<br/>(Product Service)"]
+    B --> C["3. 預扣庫存<br/>(Inventory Service)"]
+    C --> D["4. 發起支付<br/>(Payment Service)"]
+    D --> E["5. 更新訂單狀態<br/>(Order Service)"]
+    E --> F["6. 發送通知<br/>(Notification Service)<br/>透過 Kafka 非同步"]
+
+    style A fill:#4A90D9,color:#fff
+    style F fill:#CD853F,color:#fff
+```
+
+**五個微服務各司其職：**
+
+| 服務 | 職責 | 通訊方式 |
+|------|------|----------|
+| **Order Service** (指揮者) | 接收下單請求，協調整個流程 | 接收 HTTP，發起 HTTP + Kafka |
+| **Product Service** | 提供商品價格與可用性查詢 | 被動接收 HTTP |
+| **Inventory Service** | 管理庫存，處理預扣與回滾 | 被動接收 HTTP |
+| **Payment Service** | 處理支付（模擬），支援延遲模擬 | 被動接收 HTTP |
+| **Notification Service** | 消費 Kafka 事件，發送通知 | 消費 Kafka 訊息 |
 
 **核心驗證目標：**
 
@@ -153,7 +246,18 @@ graph TB
 
 ### OpenTelemetry Java Agent — 零侵入追蹤
 
-[OpenTelemetry](https://opentelemetry.io/) 是 CNCF 的開源可觀測性框架，提供統一的 Traces、Metrics、Logs 收集標準。本專案使用 **OpenTelemetry Java Agent 1.32.1**（最後支援 JDK 8 的版本），以 `-javaagent` JVM 參數方式附加至 Spring Boot 應用，**不需修改任何業務程式碼**。
+**問題：** 要追蹤請求在 5 個服務間的路徑，通常需要在每個服務中加入追蹤程式碼。但如果服務已經上線，修改程式碼風險高、成本大。
+
+**解法：** [OpenTelemetry](https://opentelemetry.io/) Java Agent 用 **Bytecode Instrumentation** 技術，在 JVM 啟動時自動修改 class 行為，攔截 HTTP 呼叫、Kafka 訊息、JDBC 查詢等，完全不需要改業務程式碼。
+
+本專案使用 **OpenTelemetry Java Agent 1.32.1**（最後支援 JDK 8 的版本），只需在 `docker-compose.yml` 中加上一個環境變數即可啟用：
+
+```yaml
+environment:
+  - JAVA_TOOL_OPTIONS=-javaagent:/opt/otel/opentelemetry-javaagent.jar
+  - OTEL_SERVICE_NAME=order-service          # 服務名稱（顯示在 Jaeger 中）
+  - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317  # Trace 資料送往何處
+```
 
 ```mermaid
 graph LR
@@ -195,7 +299,7 @@ traceparent: 00-<trace-id>-<span-id>-01
 
 ### Jaeger — 分散式追蹤後端
 
-[Jaeger](https://www.jaegertracing.io/) 是 CNCF 的開源分散式追蹤系統。本專案使用 **Jaeger All-in-One** 部署模式（含 Collector、Storage、Query、UI）。
+**Agent 收集到的 Trace 資料要送到哪裡？** 送到 [Jaeger](https://www.jaegertracing.io/)。Jaeger 是 CNCF 的開源分散式追蹤系統，提供資料收集、儲存、查詢與視覺化介面。本專案使用 **Jaeger All-in-One** 部署模式（把所有元件打包成單一容器，適合 PoC 使用）。
 
 ```mermaid
 graph LR
@@ -252,7 +356,9 @@ order-service: POST /api/orders                          [----------------------
 
 ### 什麼是藍綠部署？
 
-藍綠部署（Blue-Green Deployment）是一種零停機發布策略，同時維護兩套生產環境：
+**問題：** 當你要發布新版本的服務時，傳統做法是停掉舊版、部署新版。這段期間服務不可用。而且如果新版有 bug，回滾也很慢。
+
+**解法：** 藍綠部署（Blue-Green Deployment）是一種零停機發布策略，同時維護兩套生產環境：
 
 - **Blue（藍）**：當前穩定運行的版本（v1）
 - **Green（綠）**：待驗證的新版本（v2）
@@ -508,7 +614,15 @@ sequenceDiagram
 
 ## 六角形架構 — 類別圖
 
-每個微服務都遵循**六角形架構（Hexagonal Architecture / Ports & Adapters）**，確保業務邏輯與基礎設施解耦。
+> **給初學者：** 以下類別圖展示每個微服務的內部結構。如果你不熟悉六角形架構，先看最下方的[六角形架構層級依賴規則](#六角形架構層級依賴規則)小節，了解三層架構的概念後，再回頭看各服務的類別圖會更容易理解。
+
+每個微服務都遵循**六角形架構（Hexagonal Architecture / Ports & Adapters）**，確保業務邏輯與基礎設施解耦。簡單來說：
+
+- **Domain Layer（領域層）**：純粹的業務邏輯和實體（如 `Order`、`Product`），不依賴任何框架
+- **Application Layer（應用層）**：定義「做什麼」的 Use Case 和 Port 介面
+- **Infrastructure Layer（基礎設施層）**：實際的技術實作（REST Controller、JPA、Kafka、HTTP Client）
+
+這種架構的好處是：你可以替換任何基礎設施元件（例如把 H2 換成 PostgreSQL），而不需要修改業務邏輯。
 
 ### Order Service（核心 Orchestrator）
 
@@ -1106,9 +1220,51 @@ curl -X POST "http://localhost:8084/api/admin/simulate-delay?ms=0"
 
 **預期結果**：訂單狀態為 `PAYMENT_TIMEOUT`，Jaeger 中可看到庫存回滾呼叫。
 
-### 場景四：Kafka 非同步通知
+### 場景四：Kafka 非同步通知（Async Trace Propagation）
 
-與場景一相同的請求，在 Jaeger 中驗證同步 HTTP 段與非同步 Kafka 段串聯在同一條 Trace 中。
+與場景一使用相同的請求。重點在於觀察 **同步 HTTP 呼叫** 與 **非同步 Kafka 訊息** 如何串聯在同一條 Trace 中。
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant Order as Order Service<br/>:8081
+    participant Product as Product Service<br/>:8082
+    participant Inventory as Inventory Service<br/>:8083
+    participant Payment as Payment Service<br/>:8084
+    participant Kafka as Kafka<br/>:9092
+    participant Notification as Notification Service<br/>:8085
+
+    Client->>Order: POST /api/orders
+
+    rect rgb(200, 220, 255)
+        Note over Order,Payment: 同步 HTTP 段（Synchronous）
+        Order->>Product: GET /api/products/P001
+        Product-->>Order: 200 OK
+        Order->>Inventory: POST /api/inventory/reserve
+        Inventory-->>Order: {"reserved":true}
+        Order->>Payment: POST /api/payments
+        Payment-->>Order: {"status":"SUCCESS"}
+    end
+
+    Order->>Order: UPDATE orders SET status='CONFIRMED'
+
+    rect rgb(255, 230, 200)
+        Note over Order,Notification: 非同步 Kafka 段（Asynchronous）
+        Order->>Kafka: Produce: order-confirmed<br/>(Kafka Header 含 traceparent)
+        Note over Kafka: traceparent 透過<br/>Kafka Record Header 傳遞
+        Kafka->>Notification: Consume: order-confirmed<br/>(讀取 traceparent，建立 parent-child 關係)
+        Notification->>Notification: 查詢客戶資料 + 建立通知記錄
+    end
+
+    Order-->>Client: {"status":"CONFIRMED"}
+
+    Note over Client,Notification: Jaeger 中可看到：同一條 Trace<br/>包含 HTTP Spans + Kafka Produce Span + Kafka Consume Span
+```
+
+**在 Jaeger 中觀察重點：**
+- Kafka Producer Span（`order-service` 的 `order-confirmed send`）與 Consumer Span（`notification-service` 的 `order-confirmed process`）共享同一個 TraceID
+- Consumer Span 的 parent 是 Producer Span，形成完整的非同步追蹤鏈
+- OTel Agent 自動將 `traceparent` 注入 Kafka Record Header，Consumer 端自動解析
 
 ### 場景五：Kafka 消費失敗與 DLT
 
