@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: Product Service API
+  description: 商品目錄與價格查詢服務
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8082
+
+paths:
+  /api/products/{productId}:
+    get:
+      summary: 查詢商品資訊
+      description: 根據商品編號查詢商品名稱、價格與可用性
+      operationId: getProduct
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "P001"
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: 商品不存在
+
+components:
+  schemas:
+    ProductResponse:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: "P001"
+        name:
+          type: string
+          example: "無線藍牙耳機"
+        price:
+          type: number
+          format: double
+          example: 995.00
+        available:
+          type: boolean
+          example: true
