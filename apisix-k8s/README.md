@@ -88,7 +88,7 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
 - APISIX Gateway + etcd（`apisix` namespace）
 - 5 個微服務 + Kafka + Jaeger + Prometheus + Grafana（`ecommerce` namespace）
 - APISIX 路由、upstream、OpenTelemetry 全域規則
-- Grafana 預設 3 個 Dashboard：Service Health、JVM Metrics、Kafka Metrics
+- Grafana 預設 3 個 Dashboard：Service Health（含 Per-Endpoint 分析）、JVM Metrics（含 Memory Pool）、Kafka Metrics（含 DLT 監控）
 - Grafana 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
 - Grafana Webhook Contact Point + 嚴重等級路由 Notification Policy
 - Webhook Sink 告警接收器（記錄告警 payload 至 stdout）
@@ -283,7 +283,7 @@ apisix-k8s/
 ├── grafana/
 │   ├── configmap-datasources.yaml   # Prometheus 資料來源
 │   ├── configmap-dashboard-providers.yaml
-│   ├── configmap-dashboards.yaml    # 3 個 Dashboard JSON
+│   ├── configmap-dashboards.yaml    # 3 個 Dashboard JSON（含 Per-Endpoint、Memory Pool、DLT 增強面板）
 │   ├── configmap-alert-rules.yaml   # 4 條 Alert Rules（Error Rate、Latency、JVM Heap、Kafka Lag）
 │   ├── configmap-contact-points.yaml # Webhook Contact Point
 │   ├── configmap-notification-policies.yaml # 嚴重等級路由 Notification Policy

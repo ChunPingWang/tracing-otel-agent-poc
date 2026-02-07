@@ -202,6 +202,97 @@
           "sort": "desc"
         }
       }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Memory Pool Usage",
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_runtime_jvm_memory_usage_bytes{service_name=~\"$service\"}",
+          "legendFormat": "{{service_name}} — {{pool}} ({{type}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last", "mean"]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Class Loading",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_runtime_jvm_classes_current_loaded{service_name=~\"$service\"}",
+          "legendFormat": "{{service_name}} — loaded"
+        },
+        {
+          "refId": "B",
+          "expr": "rate(process_runtime_jvm_classes_unloaded{service_name=~\"$service\"}[$__rate_interval])",
+          "legendFormat": "{{service_name}} — unloaded/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last", "mean"]
+        }
+      }
     }
   ]
 }

@@ -270,6 +270,92 @@ data:
               "placement": "bottom"
             }
           }
+        },
+        {
+          "id": 6,
+          "title": "Request Rate by Endpoint",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 36
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(http_server_duration_milliseconds_count{service_name=~\"$service\"}[$__rate_interval])) by (service_name, http_method, http_route)",
+              "legendFormat": "{{service_name}} {{http_method}} {{http_route}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["last", "mean"]
+            }
+          }
+        },
+        {
+          "id": 7,
+          "title": "Latency by Endpoint (p95)",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 45
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.95, sum(rate(http_server_duration_milliseconds_bucket{service_name=~\"$service\"}[$__rate_interval])) by (service_name, http_method, http_route, le)) / 1000",
+              "legendFormat": "{{service_name}} {{http_method}} {{http_route}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["last", "mean", "max"]
+            }
+          }
         }
       ]
     }
@@ -478,6 +564,97 @@ data:
               "sort": "desc"
             }
           }
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Memory Pool Usage",
+          "gridPos": {
+            "x": 0,
+            "y": 36,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "process_runtime_jvm_memory_usage_bytes{service_name=~\"$service\"}",
+              "legendFormat": "{{service_name}} — {{pool}} ({{type}})"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["last", "mean"]
+            }
+          }
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Class Loading",
+          "gridPos": {
+            "x": 0,
+            "y": 45,
+            "w": 12,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "process_runtime_jvm_classes_current_loaded{service_name=~\"$service\"}",
+              "legendFormat": "{{service_name}} — loaded"
+            },
+            {
+              "refId": "B",
+              "expr": "rate(process_runtime_jvm_classes_unloaded{service_name=~\"$service\"}[$__rate_interval])",
+              "legendFormat": "{{service_name}} — unloaded/s"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["last", "mean"]
+            }
+          }
         }
       ]
     }
@@ -493,6 +670,29 @@ data:
       "time": {
         "from": "now-15m",
         "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "service",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus"
+            },
+            "query": "label_values(kafka_producer_record_send_total, service_name)",
+            "definition": "label_values(kafka_producer_record_send_total, service_name)",
+            "includeAll": true,
+            "allValue": ".*",
+            "multi": true,
+            "current": {
+              "selected": true,
+              "text": "All",
+              "value": "$__all"
+            },
+            "refresh": 1,
+            "sort": 1
+          }
+        ]
       },
       "panels": [
         {
@@ -510,7 +710,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum(rate(kafka_producer_record_send_total[$__rate_interval])) by (service_name, topic)",
+              "expr": "sum(rate(kafka_producer_record_send_total{service_name=~\"$service\"}[$__rate_interval])) by (service_name, topic)",
               "legendFormat": "{{service_name}} → {{topic}}",
               "refId": "A"
             }
@@ -556,7 +756,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum(rate(kafka_consumer_records_consumed_total[$__rate_interval])) by (service_name, topic)",
+              "expr": "sum(rate(kafka_consumer_records_consumed_total{service_name=~\"$service\"}[$__rate_interval])) by (service_name, topic)",
               "legendFormat": "{{service_name}} ← {{topic}}",
               "refId": "A"
             }
@@ -602,7 +802,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum(kafka_consumer_records_lag_max) by (service_name)",
+              "expr": "sum(kafka_consumer_records_lag_max{service_name=~\"$service\"}) by (service_name)",
               "legendFormat": "{{service_name}}",
               "refId": "A"
             }
@@ -648,7 +848,7 @@ data:
           },
           "targets": [
             {
-              "expr": "kafka_producer_byte_rate{service_name!=\"\"}",
+              "expr": "kafka_producer_byte_rate{service_name=~\"$service\"}",
               "legendFormat": "{{service_name}}",
               "refId": "A"
             }
@@ -656,6 +856,98 @@ data:
           "fieldConfig": {
             "defaults": {
               "unit": "Bps",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": ["mean", "lastNotNull", "max"]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "DLT Messages (send rate)",
+          "gridPos": {
+            "x": 0,
+            "y": 27,
+            "w": 12,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus"
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(kafka_producer_record_send_total{topic=~\".*\\\\.DLT\"}[$__rate_interval])) by (service_name, topic)",
+              "legendFormat": "{{service_name}} → {{topic}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": ["mean", "lastNotNull", "max"]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Consumer Lag by Topic",
+          "gridPos": {
+            "x": 12,
+            "y": 27,
+            "w": 12,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus"
+          },
+          "targets": [
+            {
+              "expr": "kafka_consumer_records_lag_max{service_name=~\"$service\"}",
+              "legendFormat": "{{service_name}} — {{topic}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "linear",
