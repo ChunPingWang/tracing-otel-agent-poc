@@ -30,6 +30,7 @@
 | **分散式追蹤（Distributed Tracing）** | 如何追蹤一個請求在多個微服務之間的完整路徑 |
 | **OpenTelemetry Java Agent** | 零侵入式追蹤 — 不改程式碼即可自動攔截 HTTP、Kafka、JDBC |
 | **Jaeger** | 如何用 Jaeger UI 搜尋、分析、視覺化 Trace 資料 |
+| **Grafana + Prometheus 監控** | 透過 OTel Agent 自動收集 Metrics，用 Grafana Dashboard 視覺化服務健康狀態、JVM、Kafka 指標 |
 | **藍綠部署（Blue-Green Deployment）** | 如何用 Apache APISIX 實現零停機的流量切換 |
 | **六角形架構（Hexagonal Architecture）** | 每個微服務的領域驅動設計與 Ports & Adapters 模式 |
 | **Kafka 非同步追蹤** | 同步 HTTP 與非同步 Kafka 如何串聯在同一條 Trace 中 |
@@ -90,11 +91,12 @@
 
 | | **Docker Compose** | **APISIX 藍綠部署 (Kind K8s)** |
 |---|---|---|
-| **適合場景** | 快速驗證分散式追蹤 | 驗證藍綠部署 + Gateway 追蹤透傳 |
+| **適合場景** | 快速驗證分散式追蹤 + 監控 | 驗證藍綠部署 + Gateway 追蹤透傳 |
 | **啟動指令** | `docker-compose up --build -d` | `./scripts/apisix-deploy.sh` |
 | **Order Service** | 1 個實例 | 2 個實例（Blue v1 + Green v2） |
 | **流量入口** | 直接存取 `:8081` | 經由 APISIX Gateway `:9080` |
 | **流量切換** | 無 | 支援（blue/canary/split/green/rollback） |
+| **監控** | Grafana `:3000` + Prometheus `:9090` | Grafana `:30300` + Prometheus (ClusterIP) |
 | **運行環境** | Docker | Kind Kubernetes 叢集 |
 | **預估啟動時間** | ~1 分鐘 | ~5-6 分鐘 |
 | **前置工具** | Docker, JDK 8, Maven | Docker, Kind, kubectl, Helm, jq |
@@ -160,6 +162,8 @@ graph TB
         NotificationSvc["Notification Service<br/>:8085<br/>+OTel Agent"]
         Kafka["Apache Kafka<br/>:9092<br/>(KRaft Mode)"]
         Jaeger["Jaeger All-in-One<br/>UI: :16686<br/>OTLP gRPC: :4317"]
+        Prometheus["Prometheus<br/>:9090<br/>(OTLP Receiver)"]
+        Grafana["Grafana<br/>:3000<br/>(Dashboards)"]
     end
 
     Client -->|"POST /api/orders"| OrderSvc
@@ -169,11 +173,18 @@ graph TB
     OrderSvc -->|"Kafka Produce<br/>order-confirmed"| Kafka
     Kafka -->|"Kafka Consume"| NotificationSvc
 
-    OrderSvc -.->|"OTLP/gRPC"| Jaeger
+    OrderSvc -.->|"OTLP/gRPC<br/>(Traces)"| Jaeger
     ProductSvc -.->|"OTLP/gRPC"| Jaeger
     InventorySvc -.->|"OTLP/gRPC"| Jaeger
     PaymentSvc -.->|"OTLP/gRPC"| Jaeger
     NotificationSvc -.->|"OTLP/gRPC"| Jaeger
+
+    OrderSvc -.->|"OTLP/HTTP<br/>(Metrics)"| Prometheus
+    ProductSvc -.->|"OTLP/HTTP"| Prometheus
+    InventorySvc -.->|"OTLP/HTTP"| Prometheus
+    PaymentSvc -.->|"OTLP/HTTP"| Prometheus
+    NotificationSvc -.->|"OTLP/HTTP"| Prometheus
+    Grafana -->|"PromQL"| Prometheus
 
     style OrderSvc fill:#4A90D9,color:#fff
     style ProductSvc fill:#7B68EE,color:#fff
@@ -182,6 +193,8 @@ graph TB
     style NotificationSvc fill:#CD853F,color:#fff
     style Kafka fill:#333,color:#fff
     style Jaeger fill:#1A1A2E,color:#fff
+    style Prometheus fill:#E6522C,color:#fff
+    style Grafana fill:#F46800,color:#fff
 ```
 
 ### APISIX 藍綠部署架構
@@ -208,6 +221,8 @@ graph TB
             NotificationSvc2["notification-service<br/>:8085"]
             Kafka2["Kafka :9092"]
             Jaeger2["Jaeger<br/>UI: :16686<br/>OTLP: :4317/4318"]
+            Prometheus2["Prometheus<br/>:9090<br/>(OTLP Receiver)"]
+            Grafana2["Grafana<br/>:30300<br/>(NodePort)"]
         end
     end
 
@@ -225,7 +240,7 @@ graph TB
     Green -->|"Kafka Produce"| Kafka2
     Kafka2 --> NotificationSvc2
 
-    Blue -.->|"OTLP"| Jaeger2
+    Blue -.->|"OTLP/gRPC<br/>(Traces)"| Jaeger2
     Green -.->|"OTLP"| Jaeger2
     ProductSvc2 -.->|"OTLP"| Jaeger2
     InventorySvc2 -.->|"OTLP"| Jaeger2
@@ -233,11 +248,21 @@ graph TB
     NotificationSvc2 -.->|"OTLP"| Jaeger2
     APISIX -.->|"OTLP"| Jaeger2
 
+    Blue -.->|"OTLP/HTTP<br/>(Metrics)"| Prometheus2
+    Green -.->|"OTLP/HTTP"| Prometheus2
+    ProductSvc2 -.->|"OTLP/HTTP"| Prometheus2
+    InventorySvc2 -.->|"OTLP/HTTP"| Prometheus2
+    PaymentSvc2 -.->|"OTLP/HTTP"| Prometheus2
+    NotificationSvc2 -.->|"OTLP/HTTP"| Prometheus2
+    Grafana2 -->|"PromQL"| Prometheus2
+
     style APISIX fill:#E8453C,color:#fff
     style Blue fill:#4A90D9,color:#fff
     style Green fill:#2E8B57,color:#fff
     style Kafka2 fill:#333,color:#fff
     style Jaeger2 fill:#1A1A2E,color:#fff
+    style Prometheus2 fill:#E6522C,color:#fff
+    style Grafana2 fill:#F46800,color:#fff
 ```
 
 ---
@@ -254,9 +279,16 @@ graph TB
 
 ```yaml
 environment:
-  - JAVA_TOOL_OPTIONS=-javaagent:/opt/otel/opentelemetry-javaagent.jar
-  - OTEL_SERVICE_NAME=order-service          # 服務名稱（顯示在 Jaeger 中）
-  - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317  # Trace 資料送往何處
+  JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+  OTEL_SERVICE_NAME: order-service
+  # Traces → Jaeger (gRPC)
+  OTEL_TRACES_EXPORTER: otlp
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4317
+  # Metrics → Prometheus (HTTP/protobuf, 使用 Prometheus v3 Native OTLP Receiver)
+  OTEL_METRICS_EXPORTER: otlp
+  OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: http/protobuf
+  OTEL_LOGS_EXPORTER: none
 ```
 
 ```mermaid
@@ -1067,6 +1099,8 @@ erDiagram
 | ORM | Spring Data JPA | 2.7.x | 資料存取 |
 | Tracing Agent | OpenTelemetry Java Agent | 1.32.1 | 最後支援 JDK 8 的版本 |
 | Tracing Backend | Jaeger | 1.53 (all-in-one) | OTLP 接收 + 追蹤 UI |
+| Metrics Backend | Prometheus | v3.5.1 (LTS) | Native OTLP Receiver（Push 模式，免 OTel Collector） |
+| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka） |
 | Container | Docker Compose | 最新穩定版 | 環境編排 |
 | Local K8s | Kind | v0.20+ | 本地 K8s 叢集 |
 | API Gateway | Apache APISIX | 3.9.1-debian | 藍綠部署流量管理 |
@@ -1086,7 +1120,9 @@ erDiagram
 | Notification Service | 8085 | 通知服務，消費 Kafka 事件並發送通知 |
 | Kafka | 9092 | 訊息佇列（KRaft 模式，無 ZooKeeper） |
 | Jaeger UI | 16686 | 分散式追蹤視覺化介面 |
-| Jaeger OTLP gRPC | 4317 | OpenTelemetry 資料接收端點 |
+| Jaeger OTLP gRPC | 4317 | OpenTelemetry Traces 接收端點 |
+| Prometheus | 9090 | Metrics 儲存與查詢（含 Native OTLP Receiver） |
+| Grafana | 3000 | 監控儀表板（匿名存取，無需登入） |
 | APISIX Gateway | 9080 | API Gateway（藍綠部署模式） |
 | APISIX Admin API | 9180 | 路由/upstream 動態設定 |
 
@@ -1125,8 +1161,15 @@ curl -X POST http://localhost:8081/api/orders \
   -H "Content-Type: application/json" \
   -d '{"customerId":"C001","items":[{"productId":"P001","quantity":2}]}'
 
-# 5. 開啟 Jaeger UI
+# 5. 開啟 Jaeger UI（追蹤）
 open http://localhost:16686
+
+# 6. 開啟 Grafana（監控儀表板，無需登入）
+open http://localhost:3000
+# 內建 3 個 Dashboard：Service Health Overview、JVM Metrics、Kafka Metrics
+
+# 7. 開啟 Prometheus（Metrics 查詢）
+open http://localhost:9090
 ```
 
 ### 方式二：APISIX 藍綠部署 (Kind K8s)
@@ -1170,8 +1213,9 @@ curl -H "X-Canary: true" http://localhost:9080/api/orders -X POST \
 ./scripts/apisix-test.sh all
 ./scripts/apisix-test.sh verify-traces
 
-# 6. 開啟 Jaeger UI
-open http://localhost:16686
+# 6. 開啟 UI
+open http://localhost:16686      # Jaeger（追蹤）
+open http://localhost:30300      # Grafana（監控儀表板）
 
 # 7. 清除環境
 ./scripts/apisix-teardown.sh
@@ -1313,6 +1357,18 @@ tracing-otel-agent-poc/
 ├── PRD.md                          # 產品需求文件
 ├── TECH.md                         # 技術規格文件
 │
+├── prometheus/                     # Prometheus 設定
+│   └── prometheus.yml              # OTLP Receiver + 資源屬性提升設定
+│
+├── grafana/                        # Grafana 設定與 Dashboard
+│   ├── provisioning/
+│   │   ├── datasources/            # Prometheus 資料來源自動設定
+│   │   └── dashboards/             # Dashboard 提供者自動設定
+│   └── dashboards/                 # Dashboard JSON 定義
+│       ├── service-health.json     # 服務健康概覽（請求率、錯誤率、延遲百分位、DB 連線池）
+│       ├── jvm-metrics.json        # JVM 指標（Heap、GC、Thread）
+│       └── kafka-metrics.json      # Kafka 指標（Producer/Consumer 速率、Lag）
+│
 ├── order-service/                  # 訂單編排服務 (Port 8081)
 │   ├── Dockerfile
 │   ├── pom.xml
@@ -1336,6 +1392,8 @@ tracing-otel-agent-poc/
 │   │   └── global-rules.json
 │   ├── kafka/                      # Kafka K8s manifests
 │   ├── jaeger/                     # Jaeger K8s manifests
+│   ├── prometheus/                 # Prometheus K8s manifests (ConfigMap, Deployment, Service)
+│   ├── grafana/                    # Grafana K8s manifests (ConfigMaps, Deployment, NodePort Service :30300)
 │   ├── order-service-blue/         # Blue (v1) order-service
 │   ├── order-service-green/        # Green (v2) order-service
 │   ├── product-service/
@@ -1354,7 +1412,8 @@ tracing-otel-agent-poc/
 │
 └── specs/                          # 規格文件
     ├── 001-otel-distributed-tracing/
-    └── 003-apisix-blue-green/
+    ├── 003-apisix-blue-green/
+    └── 004-grafana-dashboard/
 ```
 
 ---

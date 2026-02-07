@@ -28,10 +28,14 @@ spec:
           value: "notification-service"
         - name: OTEL_TRACES_EXPORTER
           value: "otlp"
-        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
           value: "http://jaeger:4317"
         - name: OTEL_METRICS_EXPORTER
-          value: "none"
+          value: "otlp"
+        - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+          value: "http://prometheus:9090/api/v1/otlp/v1/metrics"
+        - name: OTEL_EXPORTER_OTLP_METRICS_PROTOCOL
+          value: "http/protobuf"
         - name: OTEL_LOGS_EXPORTER
           value: "none"
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS

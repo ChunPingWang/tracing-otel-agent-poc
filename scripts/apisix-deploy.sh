@@ -137,10 +137,31 @@ deploy_base_services() {
 }
 
 # ============================================================================
-# Step 5: Deploy Microservices
+# Step 5: Deploy Prometheus & Grafana
+# ============================================================================
+deploy_monitoring() {
+  print_header "Step 5: Deploying Prometheus & Grafana"
+
+  kubectl apply -f "${K8S_DIR}/prometheus/" -n ecommerce
+  print_info "Applied Prometheus manifests"
+
+  kubectl apply -f "${K8S_DIR}/grafana/" -n ecommerce
+  print_info "Applied Grafana manifests"
+
+  print_info "Waiting for Prometheus to be ready..."
+  kubectl wait --for=condition=ready pod -l app=prometheus -n ecommerce --timeout=120s
+  print_ok "Prometheus is ready"
+
+  print_info "Waiting for Grafana to be ready..."
+  kubectl wait --for=condition=ready pod -l app=grafana -n ecommerce --timeout=120s
+  print_ok "Grafana is ready"
+}
+
+# ============================================================================
+# Step 6: Deploy Microservices
 # ============================================================================
 deploy_microservices() {
-  print_header "Step 5: Deploying Microservices"
+  print_header "Step 6: Deploying Microservices"
 
   local services=("product-service" "inventory-service" "payment-service" "notification-service" "order-service-blue" "order-service-green")
 
@@ -167,10 +188,10 @@ deploy_microservices() {
 }
 
 # ============================================================================
-# Step 6: Install APISIX via Helm
+# Step 7: Install APISIX via Helm
 # ============================================================================
 install_apisix() {
-  print_header "Step 6: Installing APISIX via Helm"
+  print_header "Step 7: Installing APISIX via Helm"
 
   helm repo add apisix https://apache.github.io/apisix-helm-chart 2>/dev/null || true
   helm repo update
@@ -194,10 +215,10 @@ install_apisix() {
 }
 
 # ============================================================================
-# Step 7: Configure APISIX Routes & Upstreams
+# Step 8: Configure APISIX Routes & Upstreams
 # ============================================================================
 configure_apisix() {
-  print_header "Step 7: Configuring APISIX Routes & Upstreams"
+  print_header "Step 8: Configuring APISIX Routes & Upstreams"
 
   # Wait for Admin API to be reachable
   print_info "Waiting for Admin API to be reachable..."
@@ -289,10 +310,10 @@ configure_apisix() {
 }
 
 # ============================================================================
-# Step 8: Verify Deployment
+# Step 9: Verify Deployment
 # ============================================================================
 verify_deployment() {
-  print_header "Step 8: Verifying Deployment"
+  print_header "Step 9: Verifying Deployment"
 
   # Check all pods
   print_info "Checking pod status..."
@@ -340,6 +361,8 @@ print_summary() {
   echo -e "  ├── APISIX Gateway:    ${GREEN}http://localhost:9080${NC}"
   echo -e "  ├── APISIX Admin API:  ${CYAN}http://localhost:9180${NC}"
   echo -e "  ├── Jaeger UI:         ${YELLOW}http://localhost:16686${NC}"
+  echo -e "  ├── Grafana:           ${GREEN}http://localhost:30300${NC}"
+  echo -e "  ├── Prometheus:        ${CYAN}http://localhost:9090${NC} (via port-forward)"
   echo -e "  ├── Order API:         ${GREEN}http://localhost:9080/api/orders${NC}"
   echo -e "  ├── Payment Admin:     ${GREEN}http://localhost:9080/payment/admin/simulate-delay?ms=5000${NC}"
   echo -e "  └── Notification Admin:${GREEN}http://localhost:9080/notification/admin/simulate-failure?enabled=true${NC}"
@@ -373,6 +396,7 @@ main() {
   create_namespace
   build_and_load_images
   deploy_base_services
+  deploy_monitoring
   deploy_microservices
   install_apisix
   configure_apisix

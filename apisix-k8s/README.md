@@ -40,6 +40,16 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
  Jaeger UI ◄── :16686 ◄│   │  Jaeger :4317/4318 │          │
                         │   │  (all-in-one)      │          │
                         │   └────────────────────┘          │
+                        │                                  │
+                        │   ┌────────────────────┐          │
+                        │   │  Prometheus :9090   │          │
+                        │   │  (OTLP Receiver)   │◄─ metrics│
+                        │   └────────┬───────────┘          │
+                        │            │                     │
+                        │   ┌────────▼───────────┐          │
+ Grafana ◄── :30300  ◄─│   │  Grafana :3000     │          │
+                        │   │  (3 Dashboards)    │          │
+                        │   └────────────────────┘          │
                         └──────────────────────────────────┘
 ```
 
@@ -67,10 +77,11 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
 ```
 
 部署內容：
-- Kind 叢集 `apisix-ecommerce`（port mapping: 9080, 9180, 16686）
+- Kind 叢集 `apisix-ecommerce`（port mapping: 9080, 9180, 16686, 30300）
 - APISIX Gateway + etcd（`apisix` namespace）
-- 5 個微服務 + Kafka + Jaeger（`ecommerce` namespace）
+- 5 個微服務 + Kafka + Jaeger + Prometheus + Grafana（`ecommerce` namespace）
 - APISIX 路由、upstream、OpenTelemetry 全域規則
+- Grafana 預設 3 個 Dashboard：Service Health、JVM Metrics、Kafka Metrics
 
 預計耗時約 5-6 分鐘。
 
@@ -142,6 +153,7 @@ curl -H "X-Canary: true" http://localhost:9080/api/orders -X POST \
 | APISIX Gateway | `http://localhost:9080` | 所有 API 請求入口 |
 | APISIX Admin API | `http://localhost:9180` | 路由/upstream 設定 |
 | Jaeger UI | `http://localhost:16686` | 追蹤視覺化 |
+| Grafana | `http://localhost:30300` | 監控儀表板（匿名存取，無需登入） |
 | Order API | `http://localhost:9080/api/orders` | 訂單 API（路由至 Blue/Green）|
 | Payment Admin | `http://localhost:9080/payment/admin/*` | 延遲模擬 |
 | Notification Admin | `http://localhost:9080/notification/admin/*` | 故障模擬 |
@@ -254,6 +266,16 @@ apisix-k8s/
 ├── jaeger/
 │   ├── deployment.yaml
 │   └── service.yaml
+├── prometheus/
+│   ├── configmap.yaml               # Prometheus OTLP receiver 設定
+│   ├── deployment.yaml
+│   └── service.yaml
+├── grafana/
+│   ├── configmap-datasources.yaml   # Prometheus 資料來源
+│   ├── configmap-dashboard-providers.yaml
+│   ├── configmap-dashboards.yaml    # 3 個 Dashboard JSON
+│   ├── deployment.yaml
+│   └── service.yaml                 # NodePort :30300
 ├── product-service/
 │   ├── deployment.yaml
 │   └── service.yaml
