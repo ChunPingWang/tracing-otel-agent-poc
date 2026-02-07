@@ -47,63 +47,63 @@
 
 ### Architecture Tests
 
-- [ ] T012 [P] Write ArchUnit test to enforce hexagonal layering constraints (domain MUST NOT depend on application/infrastructure, application MUST NOT depend on infrastructure) in order-service/src/test/java/com/ecommerce/order/ArchitectureTest.java
-- [ ] T013 [P] Write ArchUnit test for product-service in product-service/src/test/java/com/ecommerce/product/ArchitectureTest.java
-- [ ] T014 [P] Write ArchUnit test for inventory-service in inventory-service/src/test/java/com/ecommerce/inventory/ArchitectureTest.java
-- [ ] T015 [P] Write ArchUnit test for payment-service in payment-service/src/test/java/com/ecommerce/payment/ArchitectureTest.java
-- [ ] T016 [P] Write ArchUnit test for notification-service in notification-service/src/test/java/com/ecommerce/notification/ArchitectureTest.java
+- [x] T012 [P] Write ArchUnit test to enforce hexagonal layering constraints (domain MUST NOT depend on application/infrastructure, application MUST NOT depend on infrastructure) in order-service/src/test/java/com/ecommerce/order/ArchitectureTest.java
+- [x] T013 [P] Write ArchUnit test for product-service in product-service/src/test/java/com/ecommerce/product/ArchitectureTest.java
+- [x] T014 [P] Write ArchUnit test for inventory-service in inventory-service/src/test/java/com/ecommerce/inventory/ArchitectureTest.java
+- [x] T015 [P] Write ArchUnit test for payment-service in payment-service/src/test/java/com/ecommerce/payment/ArchitectureTest.java
+- [x] T016 [P] Write ArchUnit test for notification-service in notification-service/src/test/java/com/ecommerce/notification/ArchitectureTest.java
 
 ### Domain Models (all services)
 
-- [ ] T017 [P] Write unit test for Order domain model (creation, state transitions) in order-service/src/test/java/com/ecommerce/order/domain/model/OrderTest.java
-- [ ] T018 [P] Implement Order aggregate root with OrderItem, OrderStatus (CREATED/CONFIRMED/FAILED/PAYMENT_TIMEOUT), CustomerId value object in order-service/src/main/java/com/ecommerce/order/domain/model/
-- [ ] T019 [P] Write unit test for Product domain model in product-service/src/test/java/com/ecommerce/product/domain/model/ProductTest.java
-- [ ] T020 [P] Implement Product entity in product-service/src/main/java/com/ecommerce/product/domain/model/Product.java
-- [ ] T021 [P] Write unit test for Inventory domain model (reserve, release, insufficient stock) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java
-- [ ] T022 [P] Implement Inventory entity with reserve()/release() domain logic in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/Inventory.java
-- [ ] T023 [P] Write unit test for Payment domain model in payment-service/src/test/java/com/ecommerce/payment/domain/model/PaymentTest.java
-- [ ] T024 [P] Implement Payment entity with PaymentStatus (SUCCESS/FAILED) in payment-service/src/main/java/com/ecommerce/payment/domain/model/
-- [ ] T025 [P] Write unit test for Notification domain model in notification-service/src/test/java/com/ecommerce/notification/domain/model/NotificationTest.java
-- [ ] T026 [P] Implement Notification entity with NotificationStatus (SENT/FAILED) and Customer entity in notification-service/src/main/java/com/ecommerce/notification/domain/model/
+- [x] T017 [P] Write unit test for Order domain model (creation, state transitions) in order-service/src/test/java/com/ecommerce/order/domain/model/OrderTest.java
+- [x] T018 [P] Implement Order aggregate root with OrderItem, OrderStatus (CREATED/CONFIRMED/FAILED/PAYMENT_TIMEOUT), CustomerId value object in order-service/src/main/java/com/ecommerce/order/domain/model/
+- [x] T019 [P] Write unit test for Product domain model in product-service/src/test/java/com/ecommerce/product/domain/model/ProductTest.java
+- [x] T020 [P] Implement Product entity in product-service/src/main/java/com/ecommerce/product/domain/model/Product.java
+- [x] T021 [P] Write unit test for Inventory domain model (reserve, release, insufficient stock) in inventory-service/src/test/java/com/ecommerce/inventory/domain/model/InventoryTest.java
+- [x] T022 [P] Implement Inventory entity with reserve()/release() domain logic in inventory-service/src/main/java/com/ecommerce/inventory/domain/model/Inventory.java
+- [x] T023 [P] Write unit test for Payment domain model in payment-service/src/test/java/com/ecommerce/payment/domain/model/PaymentTest.java
+- [x] T024 [P] Implement Payment entity with PaymentStatus (SUCCESS/FAILED) in payment-service/src/main/java/com/ecommerce/payment/domain/model/
+- [x] T025 [P] Write unit test for Notification domain model in notification-service/src/test/java/com/ecommerce/notification/domain/model/NotificationTest.java
+- [x] T026 [P] Implement Notification entity with NotificationStatus (SENT/FAILED) and Customer entity in notification-service/src/main/java/com/ecommerce/notification/domain/model/
 
 ### Domain Events
 
-- [ ] T027 [P] Implement OrderConfirmedEvent domain event in order-service/src/main/java/com/ecommerce/order/domain/event/OrderConfirmedEvent.java
+- [x] T027 [P] Implement OrderConfirmedEvent domain event in order-service/src/main/java/com/ecommerce/order/domain/event/OrderConfirmedEvent.java
 
 ### Port Interfaces (all services)
 
-- [ ] T028 [P] Define OrderRepository port interface in order-service/src/main/java/com/ecommerce/order/domain/port/OrderRepository.java
-- [ ] T029 [P] Define ProductRepository port interface in product-service/src/main/java/com/ecommerce/product/domain/port/ProductRepository.java
-- [ ] T030 [P] Define InventoryRepository port interface in inventory-service/src/main/java/com/ecommerce/inventory/domain/port/InventoryRepository.java
-- [ ] T031 [P] Define PaymentRepository port interface in payment-service/src/main/java/com/ecommerce/payment/domain/port/PaymentRepository.java
-- [ ] T032 [P] Define NotificationRepository and CustomerRepository port interfaces in notification-service/src/main/java/com/ecommerce/notification/domain/port/
+- [x] T028 [P] Define OrderRepository port interface in order-service/src/main/java/com/ecommerce/order/domain/port/OrderRepository.java
+- [x] T029 [P] Define ProductRepository port interface in product-service/src/main/java/com/ecommerce/product/domain/port/ProductRepository.java
+- [x] T030 [P] Define InventoryRepository port interface in inventory-service/src/main/java/com/ecommerce/inventory/domain/port/InventoryRepository.java
+- [x] T031 [P] Define PaymentRepository port interface in payment-service/src/main/java/com/ecommerce/payment/domain/port/PaymentRepository.java
+- [x] T032 [P] Define NotificationRepository and CustomerRepository port interfaces in notification-service/src/main/java/com/ecommerce/notification/domain/port/
 
 ### JPA Persistence Adapters (all services)
 
-- [ ] T033 [P] Write integration test for JPA order repository in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/persistence/JpaOrderRepositoryIntegrationTest.java
-- [ ] T034 [P] Implement OrderJpaEntity and JpaOrderRepository adapter in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/persistence/
-- [ ] T035 [P] Write integration test for JPA product repository in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/out/persistence/JpaProductRepositoryIntegrationTest.java
-- [ ] T036 [P] Implement ProductJpaEntity and JpaProductRepository adapter in product-service/src/main/java/com/ecommerce/product/infrastructure/adapter/out/persistence/
-- [ ] T037 [P] Write integration test for JPA inventory repository in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/JpaInventoryRepositoryIntegrationTest.java
-- [ ] T038 [P] Implement InventoryJpaEntity and JpaInventoryRepository adapter in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/
-- [ ] T039 [P] Write integration test for JPA payment repository in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/JpaPaymentRepositoryIntegrationTest.java
-- [ ] T040 [P] Implement PaymentJpaEntity and JpaPaymentRepository adapter in payment-service/src/main/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/
-- [ ] T041 [P] Write integration test for JPA notification/customer repositories in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/JpaNotificationRepositoryIntegrationTest.java
-- [ ] T042 [P] Implement NotificationJpaEntity, CustomerJpaEntity, JpaNotificationRepository, JpaCustomerRepository adapters in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/
+- [x] T033 [P] Write integration test for JPA order repository in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/persistence/JpaOrderRepositoryIntegrationTest.java
+- [x] T034 [P] Implement OrderJpaEntity and JpaOrderRepository adapter in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/persistence/
+- [x] T035 [P] Write integration test for JPA product repository in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/out/persistence/JpaProductRepositoryIntegrationTest.java
+- [x] T036 [P] Implement ProductJpaEntity and JpaProductRepository adapter in product-service/src/main/java/com/ecommerce/product/infrastructure/adapter/out/persistence/
+- [x] T037 [P] Write integration test for JPA inventory repository in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/JpaInventoryRepositoryIntegrationTest.java
+- [x] T038 [P] Implement InventoryJpaEntity and JpaInventoryRepository adapter in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/adapter/out/persistence/
+- [x] T039 [P] Write integration test for JPA payment repository in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/JpaPaymentRepositoryIntegrationTest.java
+- [x] T040 [P] Implement PaymentJpaEntity and JpaPaymentRepository adapter in payment-service/src/main/java/com/ecommerce/payment/infrastructure/adapter/out/persistence/
+- [x] T041 [P] Write integration test for JPA notification/customer repositories in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/JpaNotificationRepositoryIntegrationTest.java
+- [x] T042 [P] Implement NotificationJpaEntity, CustomerJpaEntity, JpaNotificationRepository, JpaCustomerRepository adapters in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/persistence/
 
 ### Initial Data
 
-- [ ] T043 [P] Create data.sql with initial product data (P001, P002, P003) in product-service/src/main/resources/data.sql
-- [ ] T044 [P] Create data.sql with initial inventory data in inventory-service/src/main/resources/data.sql
-- [ ] T045 [P] Create data.sql with initial customer data (C001, C002) in notification-service/src/main/resources/data.sql
+- [x] T043 [P] Create data.sql with initial product data (P001, P002, P003) in product-service/src/main/resources/data.sql
+- [x] T044 [P] Create data.sql with initial inventory data in inventory-service/src/main/resources/data.sql
+- [x] T045 [P] Create data.sql with initial customer data (C001, C002) in notification-service/src/main/resources/data.sql
 
 ### Mapper Classes
 
-- [ ] T046 [P] Create infrastructure and application mapper classes for order-service in order-service/src/main/java/com/ecommerce/order/infrastructure/mapper/OrderInfraMapper.java and order-service/src/main/java/com/ecommerce/order/application/mapper/OrderApplicationMapper.java
-- [ ] T047 [P] Create infrastructure and application mapper classes for product-service in product-service/src/main/java/com/ecommerce/product/infrastructure/mapper/ProductInfraMapper.java and product-service/src/main/java/com/ecommerce/product/application/mapper/ProductApplicationMapper.java
-- [ ] T048 [P] Create infrastructure and application mapper classes for inventory-service in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/mapper/InventoryInfraMapper.java and inventory-service/src/main/java/com/ecommerce/inventory/application/mapper/InventoryApplicationMapper.java
-- [ ] T049 [P] Create infrastructure and application mapper classes for payment-service in payment-service/src/main/java/com/ecommerce/payment/infrastructure/mapper/PaymentInfraMapper.java and payment-service/src/main/java/com/ecommerce/payment/application/mapper/PaymentApplicationMapper.java
-- [ ] T050 [P] Create infrastructure and application mapper classes for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/mapper/NotificationInfraMapper.java and notification-service/src/main/java/com/ecommerce/notification/application/mapper/NotificationApplicationMapper.java
+- [x] T046 [P] Create infrastructure and application mapper classes for order-service in order-service/src/main/java/com/ecommerce/order/infrastructure/mapper/OrderInfraMapper.java and order-service/src/main/java/com/ecommerce/order/application/mapper/OrderApplicationMapper.java
+- [x] T047 [P] Create infrastructure and application mapper classes for product-service in product-service/src/main/java/com/ecommerce/product/infrastructure/mapper/ProductInfraMapper.java and product-service/src/main/java/com/ecommerce/product/application/mapper/ProductApplicationMapper.java
+- [x] T048 [P] Create infrastructure and application mapper classes for inventory-service in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/mapper/InventoryInfraMapper.java and inventory-service/src/main/java/com/ecommerce/inventory/application/mapper/InventoryApplicationMapper.java
+- [x] T049 [P] Create infrastructure and application mapper classes for payment-service in payment-service/src/main/java/com/ecommerce/payment/infrastructure/mapper/PaymentInfraMapper.java and payment-service/src/main/java/com/ecommerce/payment/application/mapper/PaymentApplicationMapper.java
+- [x] T050 [P] Create infrastructure and application mapper classes for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/mapper/NotificationInfraMapper.java and notification-service/src/main/java/com/ecommerce/notification/application/mapper/NotificationApplicationMapper.java
 
 **Checkpoint**: Foundation ready — all domain models, port interfaces, JPA adapters, mappers, and ArchUnit tests in place. User story implementation can now begin.
 
