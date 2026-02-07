@@ -41,6 +41,15 @@ services:
     networks:
       - ecommerce-net
 
+  webhook-sink:
+    image: mendhak/http-https-echo:39
+    ports:
+      - "8090:8080"
+    environment:
+      HTTP_PORT: 8080
+    networks:
+      - ecommerce-net
+
   grafana:
     image: grafana/grafana:11.6.0
     ports:

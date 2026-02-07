@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-sink
+  namespace: ecommerce
+  labels:
+    app: webhook-sink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-sink
+  template:
+    metadata:
+      labels:
+        app: webhook-sink
+    spec:
+      containers:
+        - name: webhook-sink
+          image: mendhak/http-https-echo:39
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HTTP_PORT
+              value: "8080"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi

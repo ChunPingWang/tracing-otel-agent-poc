@@ -49,7 +49,13 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
                         │   ┌────────▼───────────┐          │
  Grafana ◄── :30300  ◄─│   │  Grafana :3000     │          │
                         │   │  (3 Dashboards +   │          │
-                        │   │   4 Alert Rules)   │          │
+                        │   │   4 Alert Rules +  │          │
+                        │   │   Webhook Alerts)  │          │
+                        │   └────────┬───────────┘          │
+                        │            │ alerts               │
+                        │   ┌────────▼───────────┐          │
+                        │   │  Webhook Sink :8080 │          │
+                        │   │  (Alert Receiver)  │          │
                         │   └────────────────────┘          │
                         └──────────────────────────────────┘
 ```
@@ -84,6 +90,8 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
 - APISIX 路由、upstream、OpenTelemetry 全域規則
 - Grafana 預設 3 個 Dashboard：Service Health、JVM Metrics、Kafka Metrics
 - Grafana 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
+- Grafana Webhook Contact Point + 嚴重等級路由 Notification Policy
+- Webhook Sink 告警接收器（記錄告警 payload 至 stdout）
 
 預計耗時約 5-6 分鐘。
 
@@ -277,6 +285,8 @@ apisix-k8s/
 │   ├── configmap-dashboard-providers.yaml
 │   ├── configmap-dashboards.yaml    # 3 個 Dashboard JSON
 │   ├── configmap-alert-rules.yaml   # 4 條 Alert Rules（Error Rate、Latency、JVM Heap、Kafka Lag）
+│   ├── configmap-contact-points.yaml # Webhook Contact Point
+│   ├── configmap-notification-policies.yaml # 嚴重等級路由 Notification Policy
 │   ├── deployment.yaml
 │   └── service.yaml                 # NodePort :30300
 ├── product-service/
@@ -291,6 +301,9 @@ apisix-k8s/
 ├── notification-service/
 │   ├── deployment.yaml
 │   └── service.yaml
+├── webhook-sink/
+│   ├── deployment.yaml              # mendhak/http-https-echo:39
+│   └── service.yaml                 # ClusterIP :8080
 ├── order-service-blue/
 │   ├── deployment.yaml
 │   └── service.yaml

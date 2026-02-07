@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-sink
+  namespace: ecommerce
+spec:
+  selector:
+    app: webhook-sink
+  ports:
+    - port: 8080
+      targetPort: 8080

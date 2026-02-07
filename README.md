@@ -164,6 +164,7 @@ graph TB
         Jaeger["Jaeger All-in-One<br/>UI: :16686<br/>OTLP gRPC: :4317"]
         Prometheus["Prometheus<br/>:9090<br/>(OTLP Receiver)"]
         Grafana["Grafana<br/>:3000<br/>(Dashboards)"]
+        WebhookSink["Webhook Sink<br/>:8090<br/>(Alert Receiver)"]
     end
 
     Client -->|"POST /api/orders"| OrderSvc
@@ -185,6 +186,7 @@ graph TB
     PaymentSvc -.->|"OTLP/HTTP"| Prometheus
     NotificationSvc -.->|"OTLP/HTTP"| Prometheus
     Grafana -->|"PromQL"| Prometheus
+    Grafana -->|"Webhook<br/>(Alerts)"| WebhookSink
 
     style OrderSvc fill:#4A90D9,color:#fff
     style ProductSvc fill:#7B68EE,color:#fff
@@ -195,6 +197,7 @@ graph TB
     style Jaeger fill:#1A1A2E,color:#fff
     style Prometheus fill:#E6522C,color:#fff
     style Grafana fill:#F46800,color:#fff
+    style WebhookSink fill:#8B4513,color:#fff
 ```
 
 ### APISIX 藍綠部署架構
@@ -1100,7 +1103,8 @@ erDiagram
 | Tracing Agent | OpenTelemetry Java Agent | 1.32.1 | 最後支援 JDK 8 的版本 |
 | Tracing Backend | Jaeger | 1.53 (all-in-one) | OTLP 接收 + 追蹤 UI |
 | Metrics Backend | Prometheus | v3.5.1 (LTS) | Native OTLP Receiver（Push 模式，免 OTel Collector） |
-| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka）+ 4 條 Alert Rules |
+| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka）+ 4 條 Alert Rules + Webhook 告警通知 |
+| Alert Receiver | mendhak/http-https-echo | 39 | 輕量 Webhook 接收器（記錄 Grafana Alert 通知 payload 至 stdout） |
 | Container | Docker Compose | 最新穩定版 | 環境編排 |
 | Local K8s | Kind | v0.20+ | 本地 K8s 叢集 |
 | API Gateway | Apache APISIX | 3.9.1-debian | 藍綠部署流量管理 |
@@ -1122,7 +1126,8 @@ erDiagram
 | Jaeger UI | 16686 | 分散式追蹤視覺化介面 |
 | Jaeger OTLP gRPC | 4317 | OpenTelemetry Traces 接收端點 |
 | Prometheus | 9090 | Metrics 儲存與查詢（含 Native OTLP Receiver） |
-| Grafana | 3000 | 監控儀表板 + Alert Rules（匿名存取，無需登入） |
+| Grafana | 3000 | 監控儀表板 + Alert Rules + 告警通知（匿名存取，無需登入） |
+| Webhook Sink | 8090 | Alert 通知接收器（記錄告警 payload 至 stdout） |
 | APISIX Gateway | 9080 | API Gateway（藍綠部署模式） |
 | APISIX Admin API | 9180 | 路由/upstream 動態設定 |
 
@@ -1168,7 +1173,12 @@ open http://localhost:16686
 open http://localhost:3000
 # 內建 3 個 Dashboard：Service Health Overview、JVM Metrics、Kafka Metrics
 # 內建 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
+# 內建 Webhook Contact Point + 嚴重等級路由 Notification Policy
 # 查看 Alert Rules：http://localhost:3000/alerting/list
+# 查看 Contact Points：http://localhost:3000/alerting/notifications
+
+# 8. 查看告警通知記錄（Webhook Sink 收到的告警 payload）
+docker compose logs webhook-sink
 
 # 7. 開啟 Prometheus（Metrics 查詢）
 open http://localhost:9090
@@ -1366,7 +1376,10 @@ tracing-otel-agent-poc/
 │   ├── provisioning/
 │   │   ├── datasources/            # Prometheus 資料來源自動設定
 │   │   ├── dashboards/             # Dashboard 提供者自動設定
-│   │   └── alerting/               # Alert Rules 自動設定（4 條規則）
+│   │   └── alerting/               # 告警自動設定
+│   │       ├── alert-rules.yaml   # 4 條 Alert Rules
+│   │       ├── contact-points.yaml # Webhook Contact Point（→ webhook-sink:8080）
+│   │       └── notification-policies.yaml # 嚴重等級路由（critical: 1m, warning: 5m）
 │   └── dashboards/                 # Dashboard JSON 定義
 │       ├── service-health.json     # 服務健康概覽（請求率、錯誤率、延遲百分位、DB 連線池）
 │       ├── jvm-metrics.json        # JVM 指標（Heap、GC、Thread）
@@ -1397,6 +1410,7 @@ tracing-otel-agent-poc/
 │   ├── jaeger/                     # Jaeger K8s manifests
 │   ├── prometheus/                 # Prometheus K8s manifests (ConfigMap, Deployment, Service)
 │   ├── grafana/                    # Grafana K8s manifests (ConfigMaps, Deployment, NodePort Service :30300)
+│   ├── webhook-sink/               # Webhook 告警接收器 K8s manifests
 │   ├── order-service-blue/         # Blue (v1) order-service
 │   ├── order-service-green/        # Green (v2) order-service
 │   ├── product-service/
