@@ -38,6 +38,9 @@ spec:
               subPath: dashboard.yaml
             - name: dashboards
               mountPath: /var/lib/grafana/dashboards
+            - name: alert-rules
+              mountPath: /etc/grafana/provisioning/alerting/alert-rules.yaml
+              subPath: alert-rules.yaml
           resources:
             requests:
               cpu: 250m
@@ -58,3 +61,6 @@ spec:
         - name: dashboards
           configMap:
             name: grafana-dashboards
+        - name: alert-rules
+          configMap:
+            name: grafana-alert-rules

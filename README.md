@@ -1100,7 +1100,7 @@ erDiagram
 | Tracing Agent | OpenTelemetry Java Agent | 1.32.1 | 最後支援 JDK 8 的版本 |
 | Tracing Backend | Jaeger | 1.53 (all-in-one) | OTLP 接收 + 追蹤 UI |
 | Metrics Backend | Prometheus | v3.5.1 (LTS) | Native OTLP Receiver（Push 模式，免 OTel Collector） |
-| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka） |
+| Dashboard | Grafana | 11.6.0 | 監控儀表板（Service Health、JVM、Kafka）+ 4 條 Alert Rules |
 | Container | Docker Compose | 最新穩定版 | 環境編排 |
 | Local K8s | Kind | v0.20+ | 本地 K8s 叢集 |
 | API Gateway | Apache APISIX | 3.9.1-debian | 藍綠部署流量管理 |
@@ -1122,7 +1122,7 @@ erDiagram
 | Jaeger UI | 16686 | 分散式追蹤視覺化介面 |
 | Jaeger OTLP gRPC | 4317 | OpenTelemetry Traces 接收端點 |
 | Prometheus | 9090 | Metrics 儲存與查詢（含 Native OTLP Receiver） |
-| Grafana | 3000 | 監控儀表板（匿名存取，無需登入） |
+| Grafana | 3000 | 監控儀表板 + Alert Rules（匿名存取，無需登入） |
 | APISIX Gateway | 9080 | API Gateway（藍綠部署模式） |
 | APISIX Admin API | 9180 | 路由/upstream 動態設定 |
 
@@ -1167,6 +1167,8 @@ open http://localhost:16686
 # 6. 開啟 Grafana（監控儀表板，無需登入）
 open http://localhost:3000
 # 內建 3 個 Dashboard：Service Health Overview、JVM Metrics、Kafka Metrics
+# 內建 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
+# 查看 Alert Rules：http://localhost:3000/alerting/list
 
 # 7. 開啟 Prometheus（Metrics 查詢）
 open http://localhost:9090
@@ -1363,7 +1365,8 @@ tracing-otel-agent-poc/
 ├── grafana/                        # Grafana 設定與 Dashboard
 │   ├── provisioning/
 │   │   ├── datasources/            # Prometheus 資料來源自動設定
-│   │   └── dashboards/             # Dashboard 提供者自動設定
+│   │   ├── dashboards/             # Dashboard 提供者自動設定
+│   │   └── alerting/               # Alert Rules 自動設定（4 條規則）
 │   └── dashboards/                 # Dashboard JSON 定義
 │       ├── service-health.json     # 服務健康概覽（請求率、錯誤率、延遲百分位、DB 連線池）
 │       ├── jvm-metrics.json        # JVM 指標（Heap、GC、Thread）

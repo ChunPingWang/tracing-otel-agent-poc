@@ -48,7 +48,8 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
                         │            │                     │
                         │   ┌────────▼───────────┐          │
  Grafana ◄── :30300  ◄─│   │  Grafana :3000     │          │
-                        │   │  (3 Dashboards)    │          │
+                        │   │  (3 Dashboards +   │          │
+                        │   │   4 Alert Rules)   │          │
                         │   └────────────────────┘          │
                         └──────────────────────────────────┘
 ```
@@ -82,6 +83,7 @@ Apache APISIX 作為 API Gateway，在 Kind Kubernetes 叢集上實現 order-ser
 - 5 個微服務 + Kafka + Jaeger + Prometheus + Grafana（`ecommerce` namespace）
 - APISIX 路由、upstream、OpenTelemetry 全域規則
 - Grafana 預設 3 個 Dashboard：Service Health、JVM Metrics、Kafka Metrics
+- Grafana 4 條 Alert Rules：High Error Rate、High Latency、JVM Heap、Kafka Lag
 
 預計耗時約 5-6 分鐘。
 
@@ -274,6 +276,7 @@ apisix-k8s/
 │   ├── configmap-datasources.yaml   # Prometheus 資料來源
 │   ├── configmap-dashboard-providers.yaml
 │   ├── configmap-dashboards.yaml    # 3 個 Dashboard JSON
+│   ├── configmap-alert-rules.yaml   # 4 條 Alert Rules（Error Rate、Latency、JVM Heap、Kafka Lag）
 │   ├── deployment.yaml
 │   └── service.yaml                 # NodePort :30300
 ├── product-service/
