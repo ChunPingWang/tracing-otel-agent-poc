@@ -1,0 +1,84 @@
+asyncapi: 2.6.0
+info:
+  title: Order Confirmed Event
+  description: 訂單確認後由 Order Service 發送至 Kafka 的非同步事件
+  version: 1.0.0
+
+channels:
+  order-confirmed:
+    description: 訂單確認事件 Topic
+    subscribe:
+      operationId: onOrderConfirmed
+      summary: Notification Service 消費訂單確認事件
+      message:
+        $ref: '#/components/messages/OrderConfirmedEvent'
+    publish:
+      operationId: publishOrderConfirmed
+      summary: Order Service 發布訂單確認事件
+      message:
+        $ref: '#/components/messages/OrderConfirmedEvent'
+
+  order-confirmed.DLT:
+    description: Dead Letter Topic — 消費失敗且重試耗盡後的訊息
+    publish:
+      operationId: publishToDLT
+      summary: Spring Kafka 自動投遞至 DLT
+      message:
+        $ref: '#/components/messages/OrderConfirmedEvent'
+
+components:
+  messages:
+    OrderConfirmedEvent:
+      payload:
+        type: object
+        required:
+          - orderId
+          - customerId
+          - customerEmail
+          - items
+          - totalAmount
+          - status
+          - timestamp
+        properties:
+          orderId:
+            type: string
+            description: 訂單編號
+            example: "ORD-20260207-001"
+          customerId:
+            type: string
+            description: 客戶識別碼
+            example: "C001"
+          customerEmail:
+            type: string
+            description: 客戶電子郵件
+            example: "wang@example.com"
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  example: "P001"
+                quantity:
+                  type: integer
+                  example: 2
+                unitPrice:
+                  type: number
+                  format: double
+                  example: 995.00
+          totalAmount:
+            type: number
+            format: double
+            description: 訂單總金額
+            example: 1990.00
+          status:
+            type: string
+            enum: [CONFIRMED]
+            description: 訂單狀態
+            example: "CONFIRMED"
+          timestamp:
+            type: string
+            format: date-time
+            description: 事件發生時間 (ISO 8601)
+            example: "2026-02-07T10:30:45Z"

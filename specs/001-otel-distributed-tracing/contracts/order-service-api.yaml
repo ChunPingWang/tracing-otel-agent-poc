@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: Order Service API
+  description: 訂單編排服務 — 協調下單流程（查商品→扣庫存→支付→確認）
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+
+paths:
+  /api/orders:
+    post:
+      summary: 建立訂單
+      description: |
+        接收下單請求，依序呼叫 Product、Inventory、Payment 服務，
+        完成後發送 Kafka 事件至 order-confirmed Topic。
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            example:
+              customerId: "C001"
+              items:
+                - productId: "P001"
+                  quantity: 2
+      responses:
+        '200':
+          description: 訂單建立成功（狀態可能為 CONFIRMED / FAILED / PAYMENT_TIMEOUT）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+        '400':
+          description: 請求參數無效
+        '500':
+          description: 內部服務錯誤
+
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - customerId
+        - items
+      properties:
+        customerId:
+          type: string
+          description: 客戶識別碼
+          example: "C001"
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+
+    OrderItemRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          description: 商品編號
+          example: "P001"
+        quantity:
+          type: integer
+          minimum: 1
+          description: 購買數量
+          example: 2
+
+    CreateOrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 訂單編號
+          example: "ORD-20260207-001"
+        status:
+          type: string
+          enum: [CONFIRMED, FAILED, PAYMENT_TIMEOUT]
+          description: 訂單狀態
+          example: "CONFIRMED"
+        totalAmount:
+          type: number
+          format: double
+          description: 訂單總金額
+          example: 1990.00
+        traceId:
+          type: string
+          description: 追蹤鏈路 ID（從 OTel Context 取得）
+          example: "abc123def456"
