@@ -1,5 +1,18 @@
 package com.ecommerce.notification.infrastructure.mapper;
 
-public class NotificationInfraMapper {
-    // Will be populated in Phase 5 when Kafka DTOs are defined
+import com.ecommerce.notification.application.dto.OrderNotificationCommand;
+import com.ecommerce.notification.infrastructure.dto.OrderConfirmedMessage;
+
+public final class NotificationInfraMapper {
+
+    private NotificationInfraMapper() {
+    }
+
+    public static OrderNotificationCommand toCommand(OrderConfirmedMessage message) {
+        return new OrderNotificationCommand(
+                message.getOrderId(),
+                message.getCustomerId(),
+                message.getTotalAmount()
+        );
+    }
 }

@@ -10,6 +10,7 @@ import com.ecommerce.order.application.port.out.PaymentPort;
 import com.ecommerce.order.application.port.out.PaymentResult;
 import com.ecommerce.order.application.port.out.ProductInfo;
 import com.ecommerce.order.application.port.out.ProductQueryPort;
+import com.ecommerce.order.domain.event.OrderConfirmedEvent;
 import com.ecommerce.order.domain.model.Order;
 import com.ecommerce.order.domain.model.OrderStatus;
 import com.ecommerce.order.domain.port.OrderRepository;
@@ -85,6 +86,15 @@ public class CreateOrderUseCaseTest {
         verify(orderRepository, times(2)).save(orderCaptor.capture());
         Order finalOrder = orderCaptor.getAllValues().get(1);
         assertEquals(OrderStatus.CONFIRMED, finalOrder.getStatus());
+
+        // Verify event published
+        ArgumentCaptor<OrderConfirmedEvent> eventCaptor =
+                ArgumentCaptor.forClass(OrderConfirmedEvent.class);
+        verify(orderEventPublisherPort).publish(eventCaptor.capture());
+        OrderConfirmedEvent publishedEvent = eventCaptor.getValue();
+        assertEquals("C001", publishedEvent.getCustomerId());
+        assertEquals(new BigDecimal("1998.00"), publishedEvent.getTotalAmount());
+        assertEquals(1, publishedEvent.getItems().size());
     }
 
     @Test
@@ -172,6 +182,7 @@ public class CreateOrderUseCaseTest {
         // Then
         assertEquals("FAILED", result.getStatus());
         verify(paymentPort, never()).processPayment(anyString(), any(BigDecimal.class));
+        verify(orderEventPublisherPort, never()).publish(any(OrderConfirmedEvent.class));
         assertEquals(2, savedStatuses.size());
         assertEquals(OrderStatus.CREATED, savedStatuses.get(0));
         assertEquals(OrderStatus.FAILED, savedStatuses.get(1));
@@ -209,6 +220,7 @@ public class CreateOrderUseCaseTest {
         assertEquals("PAYMENT_TIMEOUT", result.getStatus());
         verify(inventoryReleasePort).releaseInventory("P001", 1);
         verify(inventoryReleasePort).releaseInventory("P002", 3);
+        verify(orderEventPublisherPort, never()).publish(any(OrderConfirmedEvent.class));
         assertEquals(2, savedStatuses.size());
         assertEquals(OrderStatus.CREATED, savedStatuses.get(0));
         assertEquals(OrderStatus.PAYMENT_TIMEOUT, savedStatuses.get(1));

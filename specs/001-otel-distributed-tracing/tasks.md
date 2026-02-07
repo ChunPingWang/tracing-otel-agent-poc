@@ -184,24 +184,24 @@
 
 ### Tests for User Story 3 (TDD)
 
-- [ ] T084 [P] [US3] Write unit test for ProcessOrderNotificationUseCase in notification-service/src/test/java/com/ecommerce/notification/application/service/ProcessOrderNotificationUseCaseTest.java
-- [ ] T085 [P] [US3] Write integration test for KafkaOrderEventPublisher (publishes to order-confirmed topic) using EmbeddedKafka in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisherIntegrationTest.java
-- [ ] T086 [P] [US3] Write integration test for OrderConfirmedListener (consumes from order-confirmed topic) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerIntegrationTest.java
+- [x] T084 [P] [US3] Write unit test for ProcessOrderNotificationUseCase in notification-service/src/test/java/com/ecommerce/notification/application/service/ProcessOrderNotificationUseCaseTest.java
+- [x] T085 [P] [US3] Write integration test for KafkaOrderEventPublisher (publishes to order-confirmed topic) using EmbeddedKafka in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisherIntegrationTest.java
+- [x] T086 [P] [US3] Write integration test for OrderConfirmedListener (consumes from order-confirmed topic) using EmbeddedKafka in notification-service/src/test/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListenerIntegrationTest.java
 
 ### Implementation for User Story 3
 
-- [ ] T087 [US3] Implement OrderEventPublisherPort (outbound) interface in order-service/src/main/java/com/ecommerce/order/application/port/out/OrderEventPublisherPort.java (if not already created in T065)
-- [ ] T088 [US3] Implement KafkaProducerConfig in order-service/src/main/java/com/ecommerce/order/infrastructure/config/KafkaProducerConfig.java
-- [ ] T089 [US3] Implement OrderConfirmedMessage infrastructure DTO in order-service/src/main/java/com/ecommerce/order/infrastructure/dto/OrderConfirmedMessage.java
-- [ ] T090 [US3] Implement KafkaOrderEventPublisher (outbound adapter using KafkaTemplate) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisher.java
-- [ ] T091 [US3] Wire Kafka event publishing into CreateOrderUseCase (publish after order confirmed) in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
-- [ ] T092 [US3] Implement ProcessOrderNotificationPort (inbound) and ProcessOrderNotificationUseCase (query customer → send notification → persist) in notification-service/src/main/java/com/ecommerce/notification/application/
-- [ ] T093 [US3] Implement NotificationSenderPort (outbound) and MockNotificationSender adapter in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/sender/MockNotificationSender.java
-- [ ] T094 [US3] Implement KafkaConsumerConfig in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
-- [ ] T095 [US3] Implement OrderConfirmedMessage infrastructure DTO for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/dto/OrderConfirmedMessage.java
-- [ ] T096 [US3] Implement OrderConfirmedListener (@KafkaListener, inbound Kafka adapter) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
-- [ ] T097 [US3] Create Dockerfile for notification-service with OTel Agent in notification-service/Dockerfile
-- [ ] T098 [US3] Update docker-compose.yml to add Kafka broker (KRaft mode) and notification-service with OTel Agent environment variables
+- [x] T087 [US3] Implement OrderEventPublisherPort (outbound) interface in order-service/src/main/java/com/ecommerce/order/application/port/out/OrderEventPublisherPort.java (已於 T065 完成)
+- [x] T088 [US3] Implement KafkaProducerConfig in order-service (Spring Boot 自動設定已足夠，無需額外 Config)
+- [x] T089 [US3] Implement OrderConfirmedMessage infrastructure DTO in order-service/src/main/java/com/ecommerce/order/infrastructure/dto/OrderConfirmedMessage.java
+- [x] T090 [US3] Implement KafkaOrderEventPublisher (outbound adapter using KafkaTemplate) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/kafka/KafkaOrderEventPublisher.java
+- [x] T091 [US3] Wire Kafka event publishing into CreateOrderUseCase (publish after order confirmed) in order-service/src/main/java/com/ecommerce/order/application/service/CreateOrderUseCase.java
+- [x] T092 [US3] Implement ProcessOrderNotificationPort (inbound) and ProcessOrderNotificationUseCase (query customer → send notification → persist) in notification-service/src/main/java/com/ecommerce/notification/application/
+- [x] T093 [US3] Implement NotificationSenderPort (outbound) and MockNotificationSender adapter in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/out/sender/MockNotificationSender.java
+- [x] T094 [US3] Implement KafkaConsumerConfig in notification-service/src/main/java/com/ecommerce/notification/infrastructure/config/KafkaConsumerConfig.java
+- [x] T095 [US3] Implement OrderConfirmedMessage infrastructure DTO for notification-service in notification-service/src/main/java/com/ecommerce/notification/infrastructure/dto/OrderConfirmedMessage.java
+- [x] T096 [US3] Implement OrderConfirmedListener (@KafkaListener, inbound Kafka adapter) in notification-service/src/main/java/com/ecommerce/notification/infrastructure/adapter/in/kafka/OrderConfirmedListener.java
+- [x] T097 [US3] Create Dockerfile for notification-service with OTel Agent in notification-service/Dockerfile
+- [x] T098 [US3] Update docker-compose.yml to add Kafka broker (KRaft mode) and notification-service with OTel Agent environment variables
 
 **Checkpoint**: 完整 5 服務鏈路可追蹤。Jaeger 同一條 Trace 涵蓋 HTTP 同步段 + Kafka 非同步段。
 

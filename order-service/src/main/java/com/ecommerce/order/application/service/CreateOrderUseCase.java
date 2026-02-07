@@ -11,8 +11,11 @@ import com.ecommerce.order.application.port.out.PaymentPort;
 import com.ecommerce.order.application.port.out.PaymentResult;
 import com.ecommerce.order.application.port.out.ProductInfo;
 import com.ecommerce.order.application.port.out.ProductQueryPort;
+import com.ecommerce.order.domain.event.OrderConfirmedEvent;
+import com.ecommerce.order.domain.event.OrderConfirmedEvent.OrderItemData;
 import com.ecommerce.order.domain.model.Order;
 import com.ecommerce.order.domain.model.OrderItem;
+import com.ecommerce.order.domain.model.OrderStatus;
 import com.ecommerce.order.domain.port.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +70,11 @@ public class CreateOrderUseCase implements CreateOrderPort {
         }
 
         order = orderRepository.save(order);
+
+        if (order.getStatus() == OrderStatus.CONFIRMED) {
+            publishOrderConfirmedEvent(order);
+        }
+
         return toResult(order);
     }
 
@@ -117,6 +125,22 @@ public class CreateOrderUseCase implements CreateOrderPort {
         if (paymentResult.isSuccess()) {
             order.confirm();
         }
+    }
+
+    private void publishOrderConfirmedEvent(Order order) {
+        List<OrderItemData> itemDataList = new ArrayList<>();
+        for (OrderItem item : order.getItems()) {
+            itemDataList.add(new OrderItemData(
+                    item.getProductId(),
+                    item.getQuantity(),
+                    item.getUnitPrice()));
+        }
+        OrderConfirmedEvent event = new OrderConfirmedEvent(
+                order.getOrderId(),
+                order.getCustomerId(),
+                itemDataList,
+                order.getTotalAmount());
+        orderEventPublisherPort.publish(event);
     }
 
     private CreateOrderResult toResult(Order order) {

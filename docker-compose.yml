@@ -13,6 +13,22 @@ services:
     networks:
       - ecommerce-net
 
+  kafka:
+    image: apache/kafka:3.7.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - ecommerce-net
+
   order-service:
     build:
       context: ./order-service
@@ -29,8 +45,10 @@ services:
       PRODUCT_SERVICE_URL: http://product-service:8082
       INVENTORY_SERVICE_URL: http://inventory-service:8083
       PAYMENT_SERVICE_URL: http://payment-service:8084
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - jaeger
+      - kafka
       - product-service
       - inventory-service
       - payment-service
@@ -88,6 +106,26 @@ services:
       OTEL_LOGS_EXPORTER: none
     depends_on:
       - jaeger
+    networks:
+      - ecommerce-net
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: notification-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - jaeger
+      - kafka
     networks:
       - ecommerce-net
 
