@@ -25,17 +25,17 @@
 
 **Purpose**: Project initialization, Maven project structure, shared configuration
 
-- [ ] T001 Create root project directory structure with 5 service directories (order-service/, product-service/, inventory-service/, payment-service/, notification-service/)
-- [ ] T002 [P] Initialize order-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in order-service/pom.xml
-- [ ] T003 [P] Initialize product-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in product-service/pom.xml
-- [ ] T004 [P] Initialize inventory-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in inventory-service/pom.xml
-- [ ] T005 [P] Initialize payment-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in payment-service/pom.xml
-- [ ] T006 [P] Initialize notification-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in notification-service/pom.xml
-- [ ] T007 [P] Create hexagonal architecture package structure for all 5 services (domain/model, domain/event, domain/service, domain/port, application/service, application/port/in, application/port/out, application/dto, application/mapper, infrastructure/adapter/in/rest, infrastructure/adapter/out/persistence, infrastructure/config, infrastructure/dto, infrastructure/mapper)
-- [ ] T008 [P] Add test dependencies to all pom.xml files (JUnit 5, Spring Boot Test, spring-kafka-test for order/notification services, ArchUnit for all services)
-- [ ] T009 [P] Configure Checkstyle plugin in all pom.xml files with method length ≤ 20 lines and cyclomatic complexity ≤ 10 rules
-- [ ] T010 [P] Create Spring Boot application.yml for each service with server port, H2 console, JPA DDL-auto settings (order:8081, product:8082, inventory:8083, payment:8084, notification:8085)
-- [ ] T011 [P] Create Spring Boot main application class for each service (OrderApplication.java, ProductApplication.java, etc.)
+- [x] T001 Create root project directory structure with 5 service directories (order-service/, product-service/, inventory-service/, payment-service/, notification-service/)
+- [x] T002 [P] Initialize order-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in order-service/pom.xml
+- [x] T003 [P] Initialize product-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in product-service/pom.xml
+- [x] T004 [P] Initialize inventory-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in inventory-service/pom.xml
+- [x] T005 [P] Initialize payment-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, H2) in payment-service/pom.xml
+- [x] T006 [P] Initialize notification-service Maven project with pom.xml (Spring Boot 2.7.18, Spring Web, Spring Data JPA, Spring Kafka, H2) in notification-service/pom.xml
+- [x] T007 [P] Create hexagonal architecture package structure for all 5 services (domain/model, domain/event, domain/service, domain/port, application/service, application/port/in, application/port/out, application/dto, application/mapper, infrastructure/adapter/in/rest, infrastructure/adapter/out/persistence, infrastructure/config, infrastructure/dto, infrastructure/mapper)
+- [x] T008 [P] Add test dependencies to all pom.xml files (JUnit 5, Spring Boot Test, spring-kafka-test for order/notification services, ArchUnit for all services)
+- [x] T009 [P] Configure Checkstyle plugin in all pom.xml files with method length ≤ 20 lines and cyclomatic complexity ≤ 10 rules
+- [x] T010 [P] Create Spring Boot application.yml for each service with server port, H2 console, JPA DDL-auto settings (order:8081, product:8082, inventory:8083, payment:8084, notification:8085)
+- [x] T011 [P] Create Spring Boot main application class for each service (OrderApplication.java, ProductApplication.java, etc.)
 
 ---
 
