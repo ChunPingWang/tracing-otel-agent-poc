@@ -49,9 +49,10 @@
 1. **Given** 商品庫存為 0，**When** 客戶發送下單請求，**Then** Trace 中
    Inventory Service 的 Span 帶有 error 標記，Payment Service 呼叫不應出現，
    訂單狀態為 FAILED
-2. **Given** Payment Service 模擬高延遲（> 3 秒），**When** 客戶發送下單請求，
-   **Then** Trace 中 Payment Service 的 Span duration 明顯偏長，Order Service
-   後續呼叫 Inventory Service 執行庫存回滾，訂單狀態為 PAYMENT_TIMEOUT
+2. **Given** Payment Service 模擬高延遲（> 3 秒）且 Order Service 的 HTTP
+   timeout 設為 3 秒，**When** 客戶發送下單請求，**Then** Trace 中 Payment
+   Service 的 Span duration 明顯偏長，Order Service 後續呼叫 Inventory Service
+   執行庫存回滾，訂單狀態為 PAYMENT_TIMEOUT
 3. **Given** 追蹤 UI 已開啟，**When** SRE 依延遲排序搜尋 Trace，**Then**
    支付超時的 Trace 排在前列且可快速識別
 
@@ -122,8 +123,9 @@ Agent 對應用效能的影響，以便評估正式環境導入的可行性。
 
 1. **Given** 服務已掛載追蹤 Agent，**When** 檢視所有微服務的業務程式碼，
    **Then** 無任何追蹤相關的 import、annotation 或 API 呼叫
-2. **Given** 相同的測試請求，**When** 分別在有 Agent 與無 Agent 環境下執行，
-   **Then** 有 Agent 環境的回應時間 overhead 低於 5%
+2. **Given** 相同的測試請求，**When** 分別在有 Agent 與無 Agent 環境下各執行
+   100 次請求（排除前 10 次 warmup），**Then** 有 Agent 環境的平均回應時間
+   overhead 低於 5%
 3. **Given** 服務需要啟動，**When** 掛載 Agent 後啟動，**Then** 啟動時間
    增加不超過 10 秒
 4. **Given** 追蹤後端服務不可用，**When** 業務請求持續進入，**Then** 業務
@@ -141,6 +143,14 @@ Agent 對應用效能的影響，以便評估正式環境導入的可行性。
 - 多筆並發訂單同時進入時，每筆訂單 MUST 各自產生獨立的 Trace，不可混淆
 - 服務啟動順序不同時，Agent MUST 在服務就緒後自動開始產生 Trace 資料
 
+## Clarifications
+
+### Session 2026-02-07
+
+- Q: Order Service 呼叫 Payment Service 的 HTTP timeout 閾值為何？ → A: 3 秒（與模擬延遲一致，清晰分界）
+- Q: Kafka 訂單確認事件的 Payload 包含哪些欄位？ → A: 完整資料（orderId, customerId, customerEmail, items, totalAmount, status）
+- Q: 效能基準測試的請求量與測量方式為何？ → A: 100 次請求取平均回應時間比較，排除前 10 次 warmup
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -149,13 +159,13 @@ Agent 對應用效能的影響，以便評估正式環境導入的可行性。
 - **FR-002**: Order Service MUST 協調完整的下單流程：建立訂單 → 查詢商品 → 預扣庫存 → 發起支付 → 確認訂單
 - **FR-003**: 所有服務間的同步呼叫 MUST 自動產生 Trace 與 Span，包含 HTTP method、URL、status code 屬性
 - **FR-004**: 所有服務的資料庫操作 MUST 自動產生 JDBC Span，包含 SQL 語句（db.statement）、資料庫系統（db.system）與執行時間
-- **FR-005**: Order Service MUST 在訂單確認後，透過 Kafka 發送「訂單已確認」事件至 `order-confirmed` Topic
+- **FR-005**: Order Service MUST 在訂單確認後，透過 Kafka 發送「訂單已確認」事件至 `order-confirmed` Topic，Payload MUST 包含 orderId、customerId、customerEmail、items、totalAmount、status 欄位
 - **FR-006**: Notification Service MUST 消費 `order-confirmed` 事件，查詢客戶資訊並發送通知（模擬）
 - **FR-007**: Kafka Producer 與 Consumer 之間的呼叫鏈 MUST 自動串聯在同一條 Trace 中，包含 Topic 名稱與 Partition 資訊
 - **FR-008**: Notification Service 消費失敗時 MUST 自動重試（最多 3 次），重試均失敗後 MUST 將訊息送至 Dead Letter Topic `order-confirmed.DLT`
 - **FR-009**: 每次重試的 Consumer Span MUST 關聯到原始 Trace，且帶有 error 標記
 - **FR-010**: 庫存不足時，Order Service MUST 將訂單狀態設為 FAILED，Trace 中 Inventory Service 的 Span MUST 帶有 error 標記
-- **FR-011**: 支付超時時，Order Service MUST 呼叫 Inventory Service 執行庫存回滾，訂單狀態設為 PAYMENT_TIMEOUT
+- **FR-011**: Order Service 呼叫 Payment Service 的 HTTP timeout MUST 設為 3 秒；超時時 Order Service MUST 呼叫 Inventory Service 執行庫存回滾，訂單狀態設為 PAYMENT_TIMEOUT
 - **FR-012**: 追蹤功能 MUST 完全透過啟動參數（-javaagent）控制，業務程式碼零修改
 - **FR-013**: 追蹤後端不可用時，業務服務 MUST 正常運作不受影響
 - **FR-014**: 所有追蹤設定 MUST 透過環境變數或 JVM 參數外部化控制
@@ -179,7 +189,7 @@ Agent 對應用效能的影響，以便評估正式環境導入的可行性。
 - **SC-002**: 五個業務場景（正常下單、庫存不足、支付超時、Kafka 非同步通知、Kafka 消費失敗重試）的 Trace 均可在追蹤 UI 中完整呈現
 - **SC-003**: HTTP 同步呼叫與 Kafka 非同步事件成功串聯在同一條 Trace 中
 - **SC-004**: 所有服務的資料庫操作自動產生追蹤資料，包含查詢語句與執行時間
-- **SC-005**: 導入追蹤後，服務回應時間 overhead 低於 5%
+- **SC-005**: 以 100 次請求（排除前 10 次 warmup）取平均，導入追蹤後服務回應時間 overhead 低於 5%
 - **SC-006**: 導入追蹤後，服務啟動時間增加不超過 10 秒
 - **SC-007**: 所有微服務的業務程式碼零修改即可產生追蹤資料
 - **SC-008**: 追蹤後端不可用時，業務服務 100% 正常運作
