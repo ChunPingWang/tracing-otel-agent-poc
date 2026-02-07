@@ -119,32 +119,32 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T051 [P] [US1] Write unit test for QueryProductUseCase in product-service/src/test/java/com/ecommerce/product/application/service/QueryProductUseCaseTest.java
-- [ ] T052 [P] [US1] Write unit test for ReserveInventoryUseCase in inventory-service/src/test/java/com/ecommerce/inventory/application/service/ReserveInventoryUseCaseTest.java
-- [ ] T053 [P] [US1] Write unit test for ProcessPaymentUseCase in payment-service/src/test/java/com/ecommerce/payment/application/service/ProcessPaymentUseCaseTest.java
-- [ ] T054 [P] [US1] Write unit test for CreateOrderUseCase (happy path: product query → inventory reserve → payment → confirm) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java
-- [ ] T055 [P] [US1] Write integration test for ProductController (GET /api/products/{id}) in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/in/rest/ProductControllerIntegrationTest.java
-- [ ] T056 [P] [US1] Write integration test for InventoryController (POST /api/inventory/reserve) in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/in/rest/InventoryControllerIntegrationTest.java
-- [ ] T057 [P] [US1] Write integration test for PaymentController (POST /api/payments) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java
-- [ ] T058 [P] [US1] Write integration test for OrderController (POST /api/orders, happy path) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java
+- [x] T051 [P] [US1] Write unit test for QueryProductUseCase in product-service/src/test/java/com/ecommerce/product/application/service/QueryProductUseCaseTest.java
+- [x] T052 [P] [US1] Write unit test for ReserveInventoryUseCase in inventory-service/src/test/java/com/ecommerce/inventory/application/service/ReserveInventoryUseCaseTest.java
+- [x] T053 [P] [US1] Write unit test for ProcessPaymentUseCase in payment-service/src/test/java/com/ecommerce/payment/application/service/ProcessPaymentUseCaseTest.java
+- [x] T054 [P] [US1] Write unit test for CreateOrderUseCase (happy path: product query → inventory reserve → payment → confirm) in order-service/src/test/java/com/ecommerce/order/application/service/CreateOrderUseCaseTest.java
+- [x] T055 [P] [US1] Write integration test for ProductController (GET /api/products/{id}) in product-service/src/test/java/com/ecommerce/product/infrastructure/adapter/in/rest/ProductControllerIntegrationTest.java
+- [x] T056 [P] [US1] Write integration test for InventoryController (POST /api/inventory/reserve) in inventory-service/src/test/java/com/ecommerce/inventory/infrastructure/adapter/in/rest/InventoryControllerIntegrationTest.java
+- [x] T057 [P] [US1] Write integration test for PaymentController (POST /api/payments) in payment-service/src/test/java/com/ecommerce/payment/infrastructure/adapter/in/rest/PaymentControllerIntegrationTest.java
+- [x] T058 [P] [US1] Write integration test for OrderController (POST /api/orders, happy path) in order-service/src/test/java/com/ecommerce/order/infrastructure/adapter/in/rest/OrderControllerIntegrationTest.java
 
 ### Implementation for User Story 1
 
-- [ ] T059 [P] [US1] Implement QueryProductPort (inbound) and QueryProductUseCase in product-service/src/main/java/com/ecommerce/product/application/
-- [ ] T060 [P] [US1] Implement ProductController REST adapter (GET /api/products/{id}) with ProductResponse DTO and ProductInfraMapper in product-service/src/main/java/com/ecommerce/product/infrastructure/
-- [ ] T061 [P] [US1] Implement ReserveInventoryPort, ReleaseInventoryPort (inbound) and ReserveInventoryUseCase with InventoryDomainService in inventory-service/src/main/java/com/ecommerce/inventory/application/
-- [ ] T062 [P] [US1] Implement InventoryController REST adapter (POST /api/inventory/reserve, POST /api/inventory/release) with DTOs and mapper in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/
-- [ ] T063 [P] [US1] Implement ProcessPaymentPort (inbound) and ProcessPaymentUseCase in payment-service/src/main/java/com/ecommerce/payment/application/
-- [ ] T064 [P] [US1] Implement PaymentController REST adapter (POST /api/payments) with DTOs and mapper in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
-- [ ] T065 [US1] Define outbound port interfaces for order-service (ProductQueryPort, InventoryReservePort, PaymentPort, OrderEventPublisherPort) in order-service/src/main/java/com/ecommerce/order/application/port/out/
-- [ ] T066 [US1] Implement CreateOrderPort (inbound) and CreateOrderUseCase (orchestrates: query product → reserve inventory → process payment → confirm order) in order-service/src/main/java/com/ecommerce/order/application/
-- [ ] T067 [US1] Configure RestTemplate with 3s timeout in order-service/src/main/java/com/ecommerce/order/infrastructure/config/RestTemplateConfig.java
-- [ ] T068 [P] [US1] Implement ProductServiceClient (outbound REST adapter for ProductQueryPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/ProductServiceClient.java
-- [ ] T069 [P] [US1] Implement InventoryServiceClient (outbound REST adapter for InventoryReservePort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/InventoryServiceClient.java
-- [ ] T070 [P] [US1] Implement PaymentServiceClient (outbound REST adapter for PaymentPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/PaymentServiceClient.java
-- [ ] T071 [US1] Implement OrderController REST adapter (POST /api/orders) with CreateOrderRequest/Response DTOs and OrderInfraMapper in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/in/rest/
-- [ ] T072 [US1] Create Dockerfile for each of the 4 services (order, product, inventory, payment) based on openjdk:8-jre-slim with OTel Agent download
-- [ ] T073 [US1] Create docker-compose.yml with Jaeger (all-in-one) + 4 services (order, product, inventory, payment) with OTel Agent environment variables
+- [x] T059 [P] [US1] Implement QueryProductPort (inbound) and QueryProductUseCase in product-service/src/main/java/com/ecommerce/product/application/
+- [x] T060 [P] [US1] Implement ProductController REST adapter (GET /api/products/{id}) with ProductResponse DTO and ProductInfraMapper in product-service/src/main/java/com/ecommerce/product/infrastructure/
+- [x] T061 [P] [US1] Implement ReserveInventoryPort, ReleaseInventoryPort (inbound) and ReserveInventoryUseCase with InventoryDomainService in inventory-service/src/main/java/com/ecommerce/inventory/application/
+- [x] T062 [P] [US1] Implement InventoryController REST adapter (POST /api/inventory/reserve, POST /api/inventory/release) with DTOs and mapper in inventory-service/src/main/java/com/ecommerce/inventory/infrastructure/
+- [x] T063 [P] [US1] Implement ProcessPaymentPort (inbound) and ProcessPaymentUseCase in payment-service/src/main/java/com/ecommerce/payment/application/
+- [x] T064 [P] [US1] Implement PaymentController REST adapter (POST /api/payments) with DTOs and mapper in payment-service/src/main/java/com/ecommerce/payment/infrastructure/
+- [x] T065 [US1] Define outbound port interfaces for order-service (ProductQueryPort, InventoryReservePort, PaymentPort, OrderEventPublisherPort) in order-service/src/main/java/com/ecommerce/order/application/port/out/
+- [x] T066 [US1] Implement CreateOrderPort (inbound) and CreateOrderUseCase (orchestrates: query product → reserve inventory → process payment → confirm order) in order-service/src/main/java/com/ecommerce/order/application/
+- [x] T067 [US1] Configure RestTemplate with 3s timeout in order-service/src/main/java/com/ecommerce/order/infrastructure/config/RestTemplateConfig.java
+- [x] T068 [P] [US1] Implement ProductServiceClient (outbound REST adapter for ProductQueryPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/ProductServiceClient.java
+- [x] T069 [P] [US1] Implement InventoryServiceClient (outbound REST adapter for InventoryReservePort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/InventoryServiceClient.java
+- [x] T070 [P] [US1] Implement PaymentServiceClient (outbound REST adapter for PaymentPort) in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/out/rest/PaymentServiceClient.java
+- [x] T071 [US1] Implement OrderController REST adapter (POST /api/orders) with CreateOrderRequest/Response DTOs and OrderInfraMapper in order-service/src/main/java/com/ecommerce/order/infrastructure/adapter/in/rest/
+- [x] T072 [US1] Create Dockerfile for each of the 4 services (order, product, inventory, payment) based on openjdk:8-jre-slim with OTel Agent download
+- [x] T073 [US1] Create docker-compose.yml with Jaeger (all-in-one) + 4 services (order, product, inventory, payment) with OTel Agent environment variables
 
 **Checkpoint**: Happy Path 下單流程完成。`docker-compose up` 後發送 POST /api/orders，在 Jaeger UI 看到 Order → Product → Inventory → Payment 完整 Trace。
 

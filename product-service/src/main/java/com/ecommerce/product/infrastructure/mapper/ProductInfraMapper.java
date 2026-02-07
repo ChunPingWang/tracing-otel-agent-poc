@@ -1,5 +1,15 @@
 package com.ecommerce.product.infrastructure.mapper;
 
+import com.ecommerce.product.application.dto.ProductResult;
+import com.ecommerce.product.infrastructure.dto.ProductResponse;
+
 public class ProductInfraMapper {
-    // Will be populated in Phase 3 when REST DTOs are defined
+    public static ProductResponse toResponse(ProductResult result) {
+        return new ProductResponse(
+                result.getProductId(),
+                result.getName(),
+                result.getPrice(),
+                result.isAvailable()
+        );
+    }
 }

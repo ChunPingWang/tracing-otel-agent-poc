@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+    networks:
+      - ecommerce-net
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: order-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      PRODUCT_SERVICE_URL: http://product-service:8082
+      INVENTORY_SERVICE_URL: http://inventory-service:8083
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+    depends_on:
+      - jaeger
+      - product-service
+      - inventory-service
+      - payment-service
+    networks:
+      - ecommerce-net
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: product-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    depends_on:
+      - jaeger
+    networks:
+      - ecommerce-net
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: inventory-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    depends_on:
+      - jaeger
+    networks:
+      - ecommerce-net
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: payment-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    depends_on:
+      - jaeger
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+    driver: bridge
