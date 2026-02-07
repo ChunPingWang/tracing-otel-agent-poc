@@ -41,6 +41,12 @@ spec:
             - name: alert-rules
               mountPath: /etc/grafana/provisioning/alerting/alert-rules.yaml
               subPath: alert-rules.yaml
+            - name: contact-points
+              mountPath: /etc/grafana/provisioning/alerting/contact-points.yaml
+              subPath: contact-points.yaml
+            - name: notification-policies
+              mountPath: /etc/grafana/provisioning/alerting/notification-policies.yaml
+              subPath: notification-policies.yaml
           resources:
             requests:
               cpu: 250m
@@ -64,3 +70,9 @@ spec:
         - name: alert-rules
           configMap:
             name: grafana-alert-rules
+        - name: contact-points
+          configMap:
+            name: grafana-contact-points
+        - name: notification-policies
+          configMap:
+            name: grafana-notification-policies

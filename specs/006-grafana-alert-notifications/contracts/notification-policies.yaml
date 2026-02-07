@@ -1,0 +1,36 @@
+# Grafana Notification Policies Provisioning
+# File: grafana/provisioning/alerting/notification-policies.yaml
+# Docs: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+#
+# The notification policy tree is a SINGLE resource per org.
+# The entire tree must be defined here — cannot be split across files.
+
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    # Default/root policy — catches all alerts not matched by child routes
+    receiver: ecommerce-webhook
+    group_by:
+      - grafana_folder
+      - alertname
+    group_wait: 10s
+    group_interval: 30s
+    repeat_interval: 5m
+    routes:
+      # Critical alerts — faster notification cadence
+      - receiver: ecommerce-webhook
+        matchers:
+          - severity = critical
+        group_wait: 5s
+        group_interval: 15s
+        repeat_interval: 1m
+        continue: false
+      # Warning alerts — standard PoC cadence
+      - receiver: ecommerce-webhook
+        matchers:
+          - severity = warning
+        group_wait: 10s
+        group_interval: 30s
+        repeat_interval: 5m
+        continue: false

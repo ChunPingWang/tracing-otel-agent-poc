@@ -1,0 +1,17 @@
+# Grafana Contact Points Provisioning
+# File: grafana/provisioning/alerting/contact-points.yaml
+# Docs: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: ecommerce-webhook
+    receivers:
+      - uid: webhook-sink
+        type: webhook
+        disableResolveMessage: false
+        settings:
+          url: http://webhook-sink:8080/grafana-alerts
+          httpMethod: POST
+          maxAlerts: '0'
