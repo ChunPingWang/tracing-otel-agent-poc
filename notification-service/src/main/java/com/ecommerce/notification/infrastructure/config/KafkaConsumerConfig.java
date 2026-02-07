@@ -41,6 +41,7 @@ public class KafkaConsumerConfig {
         deserializer.setRemoveTypeHeaders(true);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(false);
+        deserializer.setUseTypeHeaders(false);
 
         return new DefaultKafkaConsumerFactory<>(
                 props, new StringDeserializer(), deserializer);

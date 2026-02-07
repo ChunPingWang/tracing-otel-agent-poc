@@ -7,7 +7,7 @@ COPY src ./src
 RUN mvn package -DskipTests -B
 
 # ---- Run Stage ----
-FROM openjdk:8-jre-slim
+FROM eclipse-temurin:8-jre
 
 # Download OpenTelemetry Java Agent
 ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.32.1/opentelemetry-javaagent.jar /opentelemetry-javaagent.jar
