@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Inventory Service API
+  description: 庫存管理與預扣服務
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8083
+
+paths:
+  /api/inventory/reserve:
+    post:
+      summary: 庫存預扣
+      description: 預扣指定商品的庫存數量
+      operationId: reserveInventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveRequest'
+      responses:
+        '200':
+          description: 預扣成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReserveResponse'
+        '409':
+          description: 庫存不足
+
+  /api/inventory/release:
+    post:
+      summary: 庫存回滾
+      description: 釋放先前預扣的庫存數量（支付失敗/超時時呼叫）
+      operationId: releaseInventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReleaseRequest'
+      responses:
+        '200':
+          description: 回滾成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleaseResponse'
+
+components:
+  schemas:
+    ReserveRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: "P001"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+
+    ReserveResponse:
+      type: object
+      properties:
+        reserved:
+          type: boolean
+          example: true
+        remainingStock:
+          type: integer
+          example: 48
+
+    ReleaseRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: "P001"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+
+    ReleaseResponse:
+      type: object
+      properties:
+        released:
+          type: boolean
+          example: true

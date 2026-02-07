@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Payment Service API
+  description: 支付處理服務（模擬），含延遲模擬管理端點
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8084
+
+paths:
+  /api/payments:
+    post:
+      summary: 發起支付
+      description: 處理訂單支付（模擬）。Order Service 設定 3 秒 HTTP timeout。
+      operationId: processPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: 支付成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '500':
+          description: 支付處理失敗
+
+  /api/admin/simulate-delay:
+    post:
+      summary: 設定延遲模擬
+      description: 設定 Payment Service 處理延遲（毫秒），用於模擬支付超時場景
+      operationId: simulateDelay
+      parameters:
+        - name: ms
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 5000
+      responses:
+        '200':
+          description: 延遲設定成功
+
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required:
+        - orderId
+        - amount
+      properties:
+        orderId:
+          type: string
+          example: "ORD-20260207-001"
+        amount:
+          type: number
+          format: double
+          example: 1990.00
+
+    PaymentResponse:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          example: "PAY-001"
+        status:
+          type: string
+          enum: [SUCCESS, FAILED]
+          example: "SUCCESS"
