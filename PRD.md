@@ -5,7 +5,7 @@
 | 項目 | 內容 |
 |------|------|
 | 專案名稱 | E-Commerce Distributed Tracing PoC (OTel Agent) |
-| 版本 | v1.1 |
+| 版本 | v1.3 |
 | 日期 | 2026-02-07 |
 | 作者 | Enterprise Architecture Team |
 
@@ -35,6 +35,8 @@
 | BG-4 | 評估生產環境部署可行性 | 量化 Agent 對應用啟動時間與 Runtime 效能的影響 |
 | BG-5 | 驗證非同步 Kafka 鏈路追蹤 | Kafka Producer → Consumer 的呼叫鏈在同一條 Trace 中完整呈現 |
 | BG-6 | 驗證 DB 存取自動追蹤 | 所有 JDBC 操作自動產生 Span，包含 SQL 語句與執行時間 |
+| BG-7 | 驗證 Kubernetes 部署可行性 | 在 Kind 本地 K8s 叢集上透過 Ingress 完整部署並執行所有 5 個測試場景，結果與 Docker Compose 一致 |
+| BG-8 | 驗證 API Gateway 藍綠部署 | 透過 Apache APISIX 實現訂單服務的藍綠部署，支援加權流量分配、Header 路由、即時回滾，且分散式追蹤鏈路完整保留 |
 
 ---
 
@@ -164,14 +166,17 @@
 - JDBC 自動追蹤（所有服務的 DB 操作）
 - Jaeger UI 查詢與視覺化
 - 效能影響基準測試
+- Kind 本地 Kubernetes 叢集部署（含 Ingress Controller、K8s manifests、Ingress 路由規則、部署腳本、一鍵建立/銷毀）
+- Apache APISIX 藍綠部署（含加權流量分配、Header-Based 路由、即時回滾、Gateway 層追蹤透傳）
 
 ### Out of Scope
 
 - Metrics 與 Logs 的整合（僅 Traces）
 - 告警規則設定
-- 正式環境部署規劃
+- 正式環境 Kubernetes 部署（Helm Charts、PV/PVC、TLS 憑證等）
 - 前端（Browser）追蹤
 - Kafka Streams 追蹤
+- 多節點 Kind 叢集
 
 ---
 
@@ -183,7 +188,7 @@
 | 風險 | Agent 可能與既有的 APM 工具衝突 | PoC 環境獨立部署驗證 |
 | 風險 | Kafka Context Propagation 在高吞吐場景下可能增加 Header 大小 | PoC 量測 Kafka Header overhead |
 | 假設 | 服務間通訊包含同步 HTTP/REST 與非同步 Kafka 兩種模式 | — |
-| 假設 | 開發團隊可接受 Docker Compose 作為 PoC 執行環境 | — |
+| 假設 | 開發團隊可接受 Docker Compose 與 Kind K8s 作為 PoC 執行環境 | — |
 | 假設 | Kafka 使用 Spring Kafka（非原生 Kafka Client） | — |
 
 ---
@@ -199,3 +204,5 @@ PoC 在以下條件全部滿足時視為成功：
 5. Agent overhead 量測結果 < 5%（以 100 次請求取平均，排除前 10 次 warmup）
 6. 產出可重現的 Docker Compose 環境與操作文件
 7. 產出正式導入的建議報告（含升級路徑）
+8. 在 Kind 本地 K8s 叢集上完整部署並通過所有 5 個測試場景驗證
+9. 透過 Apache APISIX 完成訂單服務藍綠部署驗證，含加權流量分配、Header 路由、即時回滾與追蹤透傳
