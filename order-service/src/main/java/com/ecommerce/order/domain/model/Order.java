@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Order aggregate root. Manages order lifecycle including creation, confirmation, failure, and payment timeout.
+ */
 public class Order {
     private Long id;
     private String orderId;
@@ -18,6 +21,7 @@ public class Order {
 
     protected Order() {}
 
+    /** Creates a new order in CREATED status with the given items. */
     public static Order create(String orderId, String customerId, List<OrderItem> items) {
         Order order = new Order();
         order.orderId = orderId;
@@ -30,6 +34,7 @@ public class Order {
         return order;
     }
 
+    /** Reconstitutes an order from persisted state. */
     public static Order reconstitute(Long id, String orderId, String customerId,
             OrderStatus status, BigDecimal totalAmount, List<OrderItem> items,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -45,6 +50,7 @@ public class Order {
         return order;
     }
 
+    /** Transitions the order to CONFIRMED status. */
     public void confirm() {
         if (status != OrderStatus.CREATED) {
             throw new IllegalStateException("Cannot confirm order in status: " + status);
@@ -53,6 +59,7 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
+    /** Transitions the order to FAILED status (e.g. insufficient stock). */
     public void fail() {
         if (status != OrderStatus.CREATED) {
             throw new IllegalStateException("Cannot fail order in status: " + status);
@@ -61,6 +68,7 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
+    /** Transitions the order to PAYMENT_TIMEOUT status. */
     public void paymentTimeout() {
         if (status != OrderStatus.CREATED) {
             throw new IllegalStateException("Cannot timeout order in status: " + status);

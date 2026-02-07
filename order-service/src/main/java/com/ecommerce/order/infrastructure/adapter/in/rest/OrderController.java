@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for order operations. Exposes POST /api/orders to create orders.
+ */
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -20,6 +23,7 @@ public class OrderController {
         this.createOrderPort = createOrderPort;
     }
 
+    /** Creates an order and returns the order result with status and trace ID. */
     @PostMapping
     public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
         CreateOrderCommand command = OrderInfraMapper.toCommand(request);

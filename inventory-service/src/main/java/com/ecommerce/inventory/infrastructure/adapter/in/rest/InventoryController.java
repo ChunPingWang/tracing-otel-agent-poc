@@ -13,6 +13,9 @@ import com.ecommerce.inventory.infrastructure.dto.ReserveResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for inventory operations. Exposes reserve and release endpoints.
+ */
 @RestController
 @RequestMapping("/api/inventory")
 public class InventoryController {
@@ -26,6 +29,7 @@ public class InventoryController {
         this.releaseInventoryPort = releaseInventoryPort;
     }
 
+    /** Reserves inventory stock. Returns 409 if stock is insufficient. */
     @PostMapping("/reserve")
     public ResponseEntity<?> reserve(@RequestBody ReserveRequest request) {
         try {
@@ -37,6 +41,7 @@ public class InventoryController {
         }
     }
 
+    /** Releases previously reserved inventory back to available stock. */
     @PostMapping("/release")
     public ResponseEntity<ReleaseResponse> release(@RequestBody ReleaseRequest request) {
         releaseInventoryPort.release(

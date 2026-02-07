@@ -2,6 +2,9 @@ package com.ecommerce.product.domain.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Domain model representing a product in the catalog with ID, name, price, and availability.
+ */
 public class Product {
     private Long id;
     private String productId;

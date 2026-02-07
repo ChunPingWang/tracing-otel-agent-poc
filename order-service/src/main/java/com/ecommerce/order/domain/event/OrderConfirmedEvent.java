@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Domain event published when an order is confirmed. Sent to Kafka for async notification processing.
+ */
 public class OrderConfirmedEvent {
     private final String orderId;
     private final String customerId;
@@ -26,6 +29,7 @@ public class OrderConfirmedEvent {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public LocalDateTime getTimestamp() { return timestamp; }
 
+    /** Nested data class representing an order item within the event payload. */
     public static class OrderItemData {
         private final String productId;
         private final int quantity;

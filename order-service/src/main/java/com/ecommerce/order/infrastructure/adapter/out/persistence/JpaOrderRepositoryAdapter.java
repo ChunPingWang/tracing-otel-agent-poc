@@ -40,19 +40,20 @@ public class JpaOrderRepositoryAdapter implements OrderRepository {
         entity.setTotalAmount(order.getTotalAmount());
         entity.setCreatedAt(order.getCreatedAt());
         entity.setUpdatedAt(order.getUpdatedAt());
-
-        List<OrderItemJpaEntity> itemEntities = order.getItems().stream()
-                .map(item -> {
-                    OrderItemJpaEntity itemEntity = new OrderItemJpaEntity();
-                    itemEntity.setProductId(item.getProductId());
-                    itemEntity.setQuantity(item.getQuantity());
-                    itemEntity.setUnitPrice(item.getUnitPrice());
-                    itemEntity.setOrder(entity);
-                    return itemEntity;
-                }).collect(Collectors.toList());
-        entity.setItems(itemEntities);
-
+        entity.setItems(toItemEntities(order.getItems(), entity));
         return entity;
+    }
+
+    private List<OrderItemJpaEntity> toItemEntities(List<OrderItem> items,
+                                                     OrderJpaEntity parent) {
+        return items.stream().map(item -> {
+            OrderItemJpaEntity itemEntity = new OrderItemJpaEntity();
+            itemEntity.setProductId(item.getProductId());
+            itemEntity.setQuantity(item.getQuantity());
+            itemEntity.setUnitPrice(item.getUnitPrice());
+            itemEntity.setOrder(parent);
+            return itemEntity;
+        }).collect(Collectors.toList());
     }
 
     private Order toDomain(OrderJpaEntity entity) {

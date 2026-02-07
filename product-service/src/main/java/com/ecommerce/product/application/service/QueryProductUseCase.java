@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Use case for querying product information from the repository.
+ */
 @Service
 public class QueryProductUseCase implements QueryProductPort {
 
@@ -16,6 +19,7 @@ public class QueryProductUseCase implements QueryProductPort {
         this.productRepository = productRepository;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<ProductResult> queryProduct(String productId) {
         return productRepository.findByProductId(productId)

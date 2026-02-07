@@ -1,5 +1,8 @@
 package com.ecommerce.inventory.domain.model;
 
+/**
+ * Domain model representing inventory for a product. Tracks available and reserved stock.
+ */
 public class Inventory {
     private Long id;
     private String productId;
@@ -19,6 +22,7 @@ public class Inventory {
         this.reservedStock = reservedStock;
     }
 
+    /** Reserves the given quantity by deducting from available stock. Throws if insufficient. */
     public void reserve(int quantity) {
         if (quantity > availableStock) {
             throw new InsufficientStockException(productId, quantity, availableStock);
@@ -27,6 +31,7 @@ public class Inventory {
         this.reservedStock += quantity;
     }
 
+    /** Releases the given quantity from reserved back to available stock. */
     public void release(int quantity) {
         if (quantity > reservedStock) {
             throw new IllegalStateException(

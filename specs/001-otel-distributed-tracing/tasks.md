@@ -255,14 +255,14 @@
 
 **Purpose**: Documentation, cleanup, final validation
 
-- [ ] T111 [P] Create README.md with project overview, architecture diagram, and quickstart instructions
-- [ ] T112 [P] Add Javadoc to all public API classes across all services
-- [ ] T113 Run all unit tests across all 5 services and verify green
-- [ ] T114 Run all integration tests across all 5 services and verify green
-- [ ] T115 Run all ArchUnit tests and verify hexagonal architecture compliance
-- [ ] T116 Run Checkstyle across all services and fix violations
-- [ ] T117 Execute quickstart.md end-to-end validation: docker-compose up → run all 5 scenarios → verify Jaeger traces
-- [ ] T118 Execute benchmark scripts and fill in performance-report.md with actual results
+- [x] T111 [P] Create README.md with project overview, architecture diagram, and quickstart instructions
+- [x] T112 [P] Add Javadoc to all public API classes across all services
+- [x] T113 Run all unit tests across all 5 services and verify green
+- [x] T114 Run all integration tests across all 5 services and verify green
+- [x] T115 Run all ArchUnit tests and verify hexagonal architecture compliance
+- [x] T116 Run Checkstyle across all services and fix violations
+- [ ] T117 Execute quickstart.md end-to-end validation: docker-compose up → run all 5 scenarios → verify Jaeger traces (需要 Docker 環境手動執行)
+- [ ] T118 Execute benchmark scripts and fill in performance-report.md with actual results (需要 Docker 環境手動執行)
 
 ---
 

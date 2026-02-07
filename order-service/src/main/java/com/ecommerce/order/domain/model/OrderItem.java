@@ -2,6 +2,9 @@ package com.ecommerce.order.domain.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Value object representing a line item in an order, containing product, quantity, and unit price.
+ */
 public class OrderItem {
     private String productId;
     private int quantity;
@@ -13,6 +16,7 @@ public class OrderItem {
         this.unitPrice = unitPrice;
     }
 
+    /** Calculates the subtotal as unitPrice * quantity. */
     public BigDecimal getSubtotal() {
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }

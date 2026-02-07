@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Admin controller for Payment Service. Provides delay simulation for timeout testing.
+ */
 @RestController
 public class AdminController {
 
@@ -15,6 +18,7 @@ public class AdminController {
         this.delayConfig = delayConfig;
     }
 
+    /** Sets the simulated processing delay in milliseconds. Use 0 to disable. */
     @PostMapping("/api/admin/simulate-delay")
     public ResponseEntity<String> simulateDelay(@RequestParam("ms") int ms) {
         delayConfig.setDelayMs(ms);

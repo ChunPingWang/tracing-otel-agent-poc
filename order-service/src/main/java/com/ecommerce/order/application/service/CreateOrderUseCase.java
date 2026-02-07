@@ -25,6 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Orchestrates the order creation flow: query product, reserve inventory, process payment,
+ * and publish the order-confirmed event to Kafka.
+ */
 @Service
 @Transactional
 public class CreateOrderUseCase implements CreateOrderPort {
@@ -50,12 +54,10 @@ public class CreateOrderUseCase implements CreateOrderPort {
         this.orderEventPublisherPort = orderEventPublisherPort;
     }
 
+    /** {@inheritDoc} */
     @Override
     public CreateOrderResult createOrder(CreateOrderCommand command) {
-        List<OrderItem> orderItems = queryProductsAndBuildItems(command.getItems());
-        String orderId = generateOrderId();
-        Order order = Order.create(orderId, command.getCustomerId(), orderItems);
-        order = orderRepository.save(order);
+        Order order = initializeOrder(command);
 
         try {
             reserveInventoryForItems(command.getItems());
@@ -69,12 +71,21 @@ public class CreateOrderUseCase implements CreateOrderPort {
             return handlePaymentTimeout(order, command.getItems());
         }
 
-        order = orderRepository.save(order);
+        return finalizeOrder(order);
+    }
 
+    private Order initializeOrder(CreateOrderCommand command) {
+        List<OrderItem> orderItems = queryProductsAndBuildItems(command.getItems());
+        String orderId = generateOrderId();
+        Order order = Order.create(orderId, command.getCustomerId(), orderItems);
+        return orderRepository.save(order);
+    }
+
+    private CreateOrderResult finalizeOrder(Order order) {
+        order = orderRepository.save(order);
         if (order.getStatus() == OrderStatus.CONFIRMED) {
             publishOrderConfirmedEvent(order);
         }
-
         return toResult(order);
     }
 

@@ -3,6 +3,9 @@ package com.ecommerce.payment.domain.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Domain model representing a payment record with ID, order reference, amount, and status.
+ */
 public class Payment {
     private Long id;
     private String paymentId;
@@ -13,10 +16,12 @@ public class Payment {
 
     private Payment() {}
 
+    /** Creates a payment with SUCCESS status. */
     public static Payment createSuccess(String paymentId, String orderId, BigDecimal amount) {
         return create(paymentId, orderId, amount, PaymentStatus.SUCCESS);
     }
 
+    /** Creates a payment with FAILED status. */
     public static Payment createFailed(String paymentId, String orderId, BigDecimal amount) {
         return create(paymentId, orderId, amount, PaymentStatus.FAILED);
     }
@@ -37,6 +42,7 @@ public class Payment {
         return payment;
     }
 
+    /** Reconstitutes a payment from persisted state. */
     public static Payment reconstitute(Long id, String paymentId, String orderId,
             BigDecimal amount, PaymentStatus status, LocalDateTime createdAt) {
         Payment payment = new Payment();

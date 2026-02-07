@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Admin controller for Notification Service. Provides failure simulation for DLT testing.
+ */
 @RestController
 public class AdminController {
 
@@ -15,6 +18,7 @@ public class AdminController {
         this.failureConfig = failureConfig;
     }
 
+    /** Enables or disables failure simulation for Kafka consumer processing. */
     @PostMapping("/api/admin/simulate-failure")
     public ResponseEntity<String> simulateFailure(@RequestParam("enabled") boolean enabled) {
         failureConfig.setFailureEnabled(enabled);

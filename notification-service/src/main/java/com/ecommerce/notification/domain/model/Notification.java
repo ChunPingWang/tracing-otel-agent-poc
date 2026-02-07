@@ -2,6 +2,9 @@ package com.ecommerce.notification.domain.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Domain model representing a notification record sent (or failed) for an order confirmation.
+ */
 public class Notification {
     private Long id;
     private String orderId;
@@ -13,11 +16,13 @@ public class Notification {
 
     private Notification() {}
 
+    /** Creates a notification with SENT status. */
     public static Notification createSent(String orderId, String customerId,
             String customerEmail, String message) {
         return create(orderId, customerId, customerEmail, message, NotificationStatus.SENT);
     }
 
+    /** Creates a notification with FAILED status. */
     public static Notification createFailed(String orderId, String customerId,
             String customerEmail, String message) {
         return create(orderId, customerId, customerEmail, message, NotificationStatus.FAILED);
@@ -38,6 +43,7 @@ public class Notification {
         return n;
     }
 
+    /** Reconstitutes a notification from persisted state. */
     public static Notification reconstitute(Long id, String orderId, String customerId,
             String customerEmail, NotificationStatus status, String message, LocalDateTime createdAt) {
         Notification n = new Notification();

@@ -1,5 +1,8 @@
 package com.ecommerce.inventory.domain.model;
 
+/**
+ * Domain exception thrown when a reserve request exceeds available inventory stock.
+ */
 public class InsufficientStockException extends RuntimeException {
     private final String productId;
     private final int requested;

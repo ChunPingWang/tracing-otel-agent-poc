@@ -9,6 +9,10 @@ import com.ecommerce.payment.infrastructure.dto.PaymentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for payment processing. Exposes POST /api/payments.
+ * Supports configurable delay simulation for timeout testing.
+ */
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -22,6 +26,7 @@ public class PaymentController {
         this.delayConfig = delayConfig;
     }
 
+    /** Processes a payment, applying any configured delay before execution. */
     @PostMapping
     public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequest request) {
         delayConfig.applyDelay();

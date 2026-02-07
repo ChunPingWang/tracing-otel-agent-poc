@@ -5,6 +5,9 @@ import com.ecommerce.product.infrastructure.dto.ProductResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for product queries. Exposes GET /api/products/{productId}.
+ */
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -15,6 +18,7 @@ public class ProductController {
         this.queryProductPort = queryProductPort;
     }
 
+    /** Returns product details by product ID, or 404 if not found. */
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable String productId) {
         return queryProductPort.queryProduct(productId)

@@ -7,6 +7,9 @@ import com.ecommerce.inventory.domain.port.InventoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Use case for releasing previously reserved inventory back to available stock.
+ */
 @Service
 public class ReleaseInventoryUseCase implements ReleaseInventoryPort {
 
@@ -16,6 +19,7 @@ public class ReleaseInventoryUseCase implements ReleaseInventoryPort {
         this.inventoryRepository = inventoryRepository;
     }
 
+    /** {@inheritDoc} */
     @Override
     @Transactional
     public void release(ReleaseCommand command) {

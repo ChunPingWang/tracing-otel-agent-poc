@@ -1,5 +1,8 @@
 package com.ecommerce.notification.domain.model;
 
+/**
+ * Domain model representing a customer with contact information for notification delivery.
+ */
 public class Customer {
     private Long id;
     private String customerId;

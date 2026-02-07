@@ -8,6 +8,9 @@ import com.ecommerce.inventory.domain.port.InventoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Use case for reserving inventory. Deducts available stock and increases reserved stock.
+ */
 @Service
 public class ReserveInventoryUseCase implements ReserveInventoryPort {
 
@@ -17,6 +20,7 @@ public class ReserveInventoryUseCase implements ReserveInventoryPort {
         this.inventoryRepository = inventoryRepository;
     }
 
+    /** {@inheritDoc} */
     @Override
     @Transactional
     public ReserveResult reserve(ReserveCommand command) {

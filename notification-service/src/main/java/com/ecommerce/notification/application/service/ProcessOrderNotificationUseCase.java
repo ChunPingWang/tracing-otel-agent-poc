@@ -14,6 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Use case for processing order confirmation notifications. Resolves customer email,
+ * sends notification, and persists the notification record.
+ */
 @Service
 @Transactional
 public class ProcessOrderNotificationUseCase implements ProcessOrderNotificationPort {
@@ -32,6 +36,7 @@ public class ProcessOrderNotificationUseCase implements ProcessOrderNotification
         this.notificationSender = notificationSender;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void processNotification(OrderNotificationCommand command) {
         String email = resolveCustomerEmail(command.getCustomerId());

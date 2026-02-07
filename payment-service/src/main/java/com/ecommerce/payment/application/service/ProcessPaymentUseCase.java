@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+/**
+ * Use case for processing payments. Creates a payment record with SUCCESS status (simulated).
+ */
 @Service
 public class ProcessPaymentUseCase implements ProcessPaymentPort {
 
@@ -19,6 +22,7 @@ public class ProcessPaymentUseCase implements ProcessPaymentPort {
         this.paymentRepository = paymentRepository;
     }
 
+    /** {@inheritDoc} */
     @Override
     @Transactional
     public PaymentResult processPayment(PaymentCommand command) {
