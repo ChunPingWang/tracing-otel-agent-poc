@@ -1685,11 +1685,17 @@ Grafana           → prometheus:9090     (PromQL Queries)
 
 ![Jaeger Error Detail](docs/jaeger-product-offline-error-detail.png)
 
-展開一筆錯誤追蹤的 Span 詳情：
-- **APISIX** `POST /api/*` — 收到上游錯誤回應
-- **order-service-blue** `POST /api/orders` → `OrderController.createOrder` → `GET`（嘗試呼叫 product-service 失敗）
-- **BasicErrorController.error** — Spring Boot 錯誤處理
-- 所有 Span 均標記紅色錯誤指示器，清楚展示**錯誤傳播鏈路**
+展開一筆錯誤追蹤的完整 Span 詳情，包含 Tags、Logs 與 Exception Stack Trace：
+
+| # | 服務 | 操作 | 說明 |
+|---|------|------|------|
+| 1 | **APISIX** | `POST /api/*` | HTTP 500 — `upstream response status: 500` |
+| 2 | **order-service-blue** | `POST /api/orders` | `ResourceAccessException`: I/O error on GET request for `http://product-service:8082/api/products/P001` — Connection refused |
+| 3 | **order-service-blue** | `OrderController.createOrder` | 同上例外向上拋出，附完整 Stack Trace |
+| 4 | **order-service-blue** | `GET` | `java.net.ConnectException: Connection refused` — 實際連線 product-service 失敗的 Span |
+| 5 | **order-service-blue** | `BasicErrorController.error` | Spring Boot 預設錯誤處理器 |
+
+關鍵觀察：**錯誤從底層 `GET` Span（TCP 連線被拒）逐層傳播至 `OrderController` → `POST /api/orders` → `APISIX`，形成完整的錯誤鏈路**。Stack Trace 中可見 `RestTemplate` 發出的 HTTP GET 因 product-service 離線而觸發 `ConnectException`。
 
 ### Grafana 監控截圖
 
