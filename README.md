@@ -78,6 +78,7 @@
 - [測試場景](#測試場景)
 - [Jaeger UI 操作指南](#jaeger-ui-操作指南)
 - [K8s 微服務組態說明](#k8s-微服務組態說明)
+- [情境模擬：Product Service 離線與恢復](#情境模擬product-service-離線與恢復)
 - [專案結構](#專案結構)
 - [效能基準測試](#效能基準測試)
 - [環境清理](#環境清理)
@@ -1638,6 +1639,74 @@ All Java services → prometheus:9090     (OTLP HTTP Metrics)
 APISIX            → jaeger:4318         (OTLP HTTP Traces)
 Grafana           → prometheus:9090     (PromQL Queries)
 ```
+
+---
+
+## 情境模擬：Product Service 離線與恢復
+
+本節模擬 `product-service` 離線 20 秒後恢復的場景，驗證分散式追蹤在服務中斷時的錯誤傳播與恢復能力。
+
+### 情境設計
+
+| 階段 | 動作 | 預期結果 |
+|------|------|----------|
+| **Phase A — Baseline** | 發送 3 筆正常訂單 | 全部 HTTP 200，建立基準線 |
+| **Phase B — Outage** | 將 product-service 縮放至 0 副本，發送 3 筆訂單 | 全部 HTTP 500，product-service 不可達 |
+| **Phase C — Recovery** | 將 product-service 恢復至 1 副本，等待就緒 | Pod Ready，APISIX 健康檢查通過 |
+| **Phase D — After** | 發送 3 筆訂單驗證恢復 | 全部 HTTP 200，服務完全恢復 |
+
+### 執行方式
+
+```bash
+./scripts/product-offline-test.sh
+```
+
+### Jaeger 追蹤截圖
+
+#### 錯誤追蹤列表（Outage 期間）
+
+![Jaeger Error Traces](docs/jaeger-product-offline-error.png)
+
+離線期間的錯誤追蹤列表。可以觀察到：
+- 每筆追蹤僅包含 **5 個 Span**（正常為 45 個），因為 product-service 無法回應
+- 標記為 **「4 Errors」**，錯誤從 order-service 向上傳播至 APISIX
+- 僅涉及 **APISIX + order-service-blue** 兩個服務，product-service 完全缺席
+
+#### 追蹤時間線（完整場景）
+
+![Jaeger Timeline](docs/jaeger-product-offline-timeline.png)
+
+完整場景的追蹤時間線，清楚呈現三個階段的對比：
+- **恢復後的追蹤**（上方）：45 Spans，包含所有 5 個微服務（APISIX、inventory、notification、order-service-blue、payment、product）
+- **離線期間的追蹤**（中間）：5 Spans，標記 「4 Errors」，僅有 APISIX + order-service-blue
+- 散點圖中的**紅色高點**代表離線期間的錯誤追蹤（高延遲）
+
+#### 錯誤追蹤詳情
+
+![Jaeger Error Detail](docs/jaeger-product-offline-error-detail.png)
+
+展開一筆錯誤追蹤的 Span 詳情：
+- **APISIX** `POST /api/*` — 收到上游錯誤回應
+- **order-service-blue** `POST /api/orders` → `OrderController.createOrder` → `GET`（嘗試呼叫 product-service 失敗）
+- **BasicErrorController.error** — Spring Boot 錯誤處理
+- 所有 Span 均標記紅色錯誤指示器，清楚展示**錯誤傳播鏈路**
+
+### Grafana 監控截圖
+
+#### Service Health Overview
+
+![Grafana Service Health](docs/grafana-product-offline-health.png)
+
+Grafana Service Health Overview 儀表板顯示：
+- **Request Rate**：product-service 在測試執行期間（約 12:50）出現請求量變化
+- **Response Latency (p50, p95, p99)**：恢復後的延遲數據，可觀察冷啟動對延遲的影響
+
+### 關鍵觀察
+
+1. **零侵入的錯誤追蹤**：OpenTelemetry Java Agent 自動捕獲所有錯誤 Span，無需修改任何業務程式碼
+2. **錯誤傳播可視化**：Jaeger 清楚顯示錯誤從 product-service 連線失敗 → order-service → APISIX 的傳播路徑
+3. **服務恢復驗證**：恢復後的追蹤恢復正常的 45 Span 結構，證明系統完全恢復
+4. **APISIX 健康檢查**：APISIX 的上游健康檢查機制能自動偵測服務恢復，恢復流量路由
 
 ---
 
