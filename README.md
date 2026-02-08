@@ -77,6 +77,7 @@
   - [方式二：APISIX 藍綠部署 (Kind K8s)](#方式二apisix-藍綠部署-kind-k8s)
 - [測試場景](#測試場景)
 - [Jaeger UI 操作指南](#jaeger-ui-操作指南)
+- [K8s 微服務組態說明](#k8s-微服務組態說明)
 - [專案結構](#專案結構)
 - [效能基準測試](#效能基準測試)
 - [環境清理](#環境清理)
@@ -1386,6 +1387,257 @@ curl -X POST "http://localhost:8085/api/admin/simulate-failure?enabled=false"
 | 服務依賴 | 點擊 System Architecture -> 查看 DAG 依賴圖 |
 | 錯誤篩選 | 搜尋條件中設定 Tags: `error=true` |
 | 藍綠辨識 | 搜尋 `order-service-blue` 或 `order-service-green` 區分版本 |
+
+---
+
+## K8s 微服務組態說明
+
+本節說明 Kind Kubernetes 叢集（APISIX 藍綠部署模式）中各元件的組態設計，供日後維護與擴展參考。
+
+所有 manifest 位於 `apisix-k8s/` 目錄下，每個服務一個子目錄，包含 `deployment.yaml` 與 `service.yaml`。
+
+### Kind Cluster 組態
+
+```yaml
+# apisix-k8s/kind-config.yaml
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30080  → hostPort: 9080   # APISIX Gateway
+  - containerPort: 30180  → hostPort: 9180   # APISIX Admin API
+  - containerPort: 30686  → hostPort: 16686  # Jaeger UI
+```
+
+Kind 叢集使用單一 control-plane 節點，透過 `extraPortMappings` 將 NodePort 映射到主機埠，使本機可以直接存取 Gateway、Admin API 和 Jaeger UI。
+
+### Namespace 設計
+
+| Namespace | 用途 | 包含元件 |
+|-----------|------|---------|
+| `apisix` | API Gateway 層 | APISIX、etcd |
+| `ecommerce` | 業務服務 + 基礎設施 | 5 個微服務、Kafka、Jaeger、Prometheus、Grafana |
+
+### 業務微服務（共通設計模式）
+
+5 個 Java 微服務採用相同的組態模式，差異僅在服務名稱、埠號和額外環境變數：
+
+| 服務 | Image | Port | OTEL_SERVICE_NAME | 額外環境變數 |
+|------|-------|------|-------------------|-------------|
+| order-service-blue | `order-service:latest` | 8081 | `order-service-blue` | `PRODUCT_SERVICE_URL`, `INVENTORY_SERVICE_URL`, `PAYMENT_SERVICE_URL`, `SPRING_KAFKA_BOOTSTRAP_SERVERS`, `APP_VERSION=v1-blue` |
+| order-service-green | `order-service:latest` | 8081 | `order-service-green` | 同上，`APP_VERSION=v2-green` |
+| product-service | `product-service:latest` | 8082 | `product-service` | — |
+| inventory-service | `inventory-service:latest` | 8083 | `inventory-service` | — |
+| payment-service | `payment-service:latest` | 8084 | `payment-service` | — |
+| notification-service | `notification-service:latest` | 8085 | `notification-service` | `SPRING_KAFKA_BOOTSTRAP_SERVERS` |
+
+**共通環境變數（OTel Agent 組態）：**
+
+| 環境變數 | 值 | 說明 |
+|---------|-----|------|
+| `JAVA_TOOL_OPTIONS` | `-javaagent:/opentelemetry-javaagent.jar` | 啟動 OTel Java Agent（零侵入式追蹤的核心） |
+| `OTEL_TRACES_EXPORTER` | `otlp` | Trace 匯出格式：OpenTelemetry Protocol |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | `http://jaeger:4317` | Trace 目的地：Jaeger gRPC 端點 |
+| `OTEL_METRICS_EXPORTER` | `otlp` | Metrics 匯出格式 |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | `http://prometheus:9090/api/v1/otlp/v1/metrics` | Metrics 目的地：Prometheus OTLP Receiver |
+| `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL` | `http/protobuf` | Metrics 使用 HTTP/Protobuf（Prometheus 不支援 gRPC OTLP） |
+| `OTEL_LOGS_EXPORTER` | `none` | 不匯出 Logs（PoC 不需要） |
+
+**共通資源配置：**
+
+```yaml
+resources:
+  requests:
+    memory: "384Mi"    # JVM + OTel Agent 基本需求
+    cpu: "200m"
+  limits:
+    memory: "768Mi"    # 防止 OOMKilled（Java 8 + OTel Agent 需要較多記憶體）
+    cpu: "500m"
+```
+
+**共通 Readiness Probe：**
+
+```yaml
+readinessProbe:
+  httpGet:
+    path: /h2-console    # H2 Database Web Console（Spring Boot 自動啟用）
+    port: <service-port>
+  initialDelaySeconds: 90   # Java 8 + OTel Agent 啟動需要 60-90 秒
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 10      # 容忍 10 次失敗（共約 150 秒啟動時間）
+```
+
+> **設計決策**：`initialDelaySeconds: 90` 和 `failureThreshold: 10` 的設定是因為 Java 8 搭配 OTel Agent 的冷啟動時間較長。OTel Agent 在啟動時需要攔截並插樁（instrument）所有 HTTP、JDBC、Kafka 相關的 class，導致啟動時間從原本的 ~10 秒延長至 ~60-90 秒。
+
+**共通 Service 類型：** 全部使用 `ClusterIP`（僅叢集內部存取），外部流量統一經由 APISIX Gateway 進入。
+
+### Order Service 藍綠設計
+
+Blue 和 Green 使用**相同的 Docker Image**（`order-service:latest`），透過以下機制區分：
+
+| 區分方式 | Blue | Green |
+|---------|------|-------|
+| Deployment label | `version: blue` | `version: green` |
+| Service selector | `app: order-service, version: blue` | `app: order-service, version: green` |
+| `OTEL_SERVICE_NAME` | `order-service-blue` | `order-service-green` |
+| `APP_VERSION` | `v1-blue` | `v2-green` |
+
+APISIX 的 `traffic-split` 外掛根據 upstream 設定將流量按權重分配至兩個 Service。
+
+### Apache APISIX（API Gateway）
+
+透過 Helm Chart 安裝至 `apisix` namespace：
+
+```yaml
+# apisix-k8s/apisix-values.yaml 重點組態
+apisix:
+  image: apache/apisix:3.9.1-debian
+  gateway:
+    type: NodePort
+    nodePort: 30080          # → host :9080
+  admin:
+    type: NodePort
+    nodePort: 30180          # → host :9180
+    credentials:
+      admin: "poc-admin-key-2024"
+
+  plugins:                   # 啟用的外掛
+    - traffic-split          # 藍綠流量分配
+    - proxy-rewrite          # URL 重寫（payment/notification admin 路由）
+    - opentelemetry          # 追蹤透傳（產生 Gateway Span）
+
+etcd:
+  replicaCount: 1
+  persistence: false         # PoC 不需要持久化
+```
+
+**APISIX 路由設計（透過 Admin API 設定）：**
+
+| Route | URI | Upstream | 外掛 |
+|-------|-----|----------|------|
+| order-api | `/api/*` | order-blue (權重) + order-green (traffic-split) | `traffic-split`（支援 `X-Canary` header） |
+| payment-admin | `/payment/*` | payment-service | `proxy-rewrite`（`/payment/(.*)` → `/api/$1`） |
+| notification-admin | `/notification/*` | notification-service | `proxy-rewrite`（`/notification/(.*)` → `/api/$1`） |
+
+**OpenTelemetry 外掛**需要透過 Admin API 設定 `plugin_metadata`，才能將 Gateway Span 送至 Jaeger：
+
+```bash
+curl http://localhost:9180/apisix/admin/plugin_metadata/opentelemetry \
+  -H "X-API-KEY: poc-admin-key-2024" -X PUT -d '{
+    "resource": { "service.name": "APISIX" },
+    "collector": { "address": "jaeger.ecommerce.svc.cluster.local:4318" }
+  }'
+```
+
+### Apache Kafka
+
+```yaml
+# KRaft 模式（無 ZooKeeper）
+image: apache/kafka:3.7.0
+KAFKA_PROCESS_ROLES: "broker,controller"   # 同時扮演 broker 和 controller
+KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"  # 單節點 Raft
+KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"         # 單節點不需要副本
+KAFKA_LOG_DIRS: "/tmp/kafka-logs"           # 使用 emptyDir volume（可寫入）
+```
+
+| 設計決策 | 說明 |
+|---------|------|
+| KRaft 模式 | 省去 ZooKeeper，簡化 PoC 部署 |
+| `localhost:9093` | Controller 透過 localhost 連接自己（避免 Service DNS 解析延遲） |
+| `emptyDir` volume | Kafka 3.7.0 容器以 `appuser` (uid=1000) 執行，`/var/kafka-logs` 無寫入權限，改用 `/tmp/kafka-logs` + `emptyDir` |
+| Service 暴露 9092 + 9093 | 9092 供業務服務連接，9093 供 KRaft controller 通訊 |
+
+### Jaeger（分散式追蹤後端）
+
+```yaml
+image: jaegertracing/all-in-one:1.53
+ports:
+  - 16686  # Web UI
+  - 4317   # OTLP gRPC（接收 Java 服務的 Traces）
+  - 4318   # OTLP HTTP（接收 APISIX 的 Traces）
+env:
+  COLLECTOR_OTLP_ENABLED: "true"
+```
+
+| 設計決策 | 說明 |
+|---------|------|
+| All-in-One 模式 | Collector + Query + UI 打包在單一容器，適合 PoC |
+| NodePort 30686 | 透過 Kind extraPortMappings 映射到 host `:16686` |
+| 同時開啟 gRPC + HTTP | Java 服務用 gRPC (4317)，APISIX 用 HTTP (4318) |
+
+### Prometheus（指標收集）
+
+```yaml
+image: prom/prometheus:v3.5.1
+args:
+  - "--web.enable-otlp-receiver"    # 啟用 OTLP Receiver（接收 OTel Agent 推送的 Metrics）
+  - "--config.file=/etc/prometheus/prometheus.yml"
+```
+
+Prometheus v3.5.1 原生支援 OTLP Receiver，無需額外安裝 OpenTelemetry Collector。OTel Agent 直接將 Metrics 推送至 Prometheus 的 `/api/v1/otlp/v1/metrics` 端點。
+
+ConfigMap 中的 `prometheus.yml` 設定：
+- `otlp.promote_resource_attributes`: 將 `service.name` 等 resource attribute 提升為 label，便於在 Grafana 中以 `service_name` 篩選
+- `storage.tsdb.out_of_order_time_window: 30m`: 容許 30 分鐘內的亂序樣本（OTLP push 模式偶爾會有時間偏移）
+
+### Grafana（監控儀表板）
+
+```yaml
+image: grafana/grafana:11.6.0
+env:
+  GF_AUTH_ANONYMOUS_ENABLED: "true"       # 免登入（PoC 便利性）
+  GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+  GF_AUTH_DISABLE_LOGIN_FORM: "true"
+```
+
+透過 6 個 ConfigMap 實現完全自動化 provisioning（無需手動設定）：
+
+| ConfigMap | 掛載路徑 | 用途 |
+|-----------|---------|------|
+| `grafana-datasources` | `/etc/grafana/provisioning/datasources/` | Prometheus 資料源 |
+| `grafana-dashboard-providers` | `/etc/grafana/provisioning/dashboards/` | Dashboard 載入設定 |
+| `grafana-dashboards` | `/var/lib/grafana/dashboards/` | 3 個 Dashboard JSON（Service Health、JVM Metrics、Kafka Metrics） |
+| `grafana-alert-rules` | `/etc/grafana/provisioning/alerting/` | 4 條告警規則 |
+| `grafana-contact-points` | `/etc/grafana/provisioning/alerting/` | Webhook 通知端點 |
+| `grafana-notification-policies` | `/etc/grafana/provisioning/alerting/` | 告警路由策略（依 severity 分流） |
+
+**預設 Dashboard：**
+
+| Dashboard | 主要面板 |
+|-----------|---------|
+| Service Health Overview | Request Rate、Error Rate、Response Latency (p50/p95/p99)、DB Connection Pool、Per-Endpoint 分析 |
+| JVM Metrics | Heap/Non-Heap Memory、GC Count/Duration、Thread Count、Memory Pool、Class Loading |
+| Kafka Metrics | Producer Send Rate、Consumer Receive Rate、Consumer Lag、DLT Messages |
+
+**告警規則：**
+
+| 規則 | 觸發條件 | 嚴重度 |
+|------|---------|--------|
+| High Error Rate | 5xx 錯誤率 > 5%（持續 1 分鐘） | `critical` |
+| High Response Latency | p95 延遲 > 2000ms（持續 1 分鐘） | `warning` |
+| JVM Heap Memory Pressure | Heap 使用率 > 80%（持續 2 分鐘） | `warning` |
+| Kafka Consumer Lag High | Consumer Lag > 1000 筆（持續 2 分鐘） | `warning` |
+
+### 元件連接關係總覽
+
+```
+Client → :9080 (APISIX Gateway)
+                ├── /api/*         → order-service-blue:8081 (or green, by traffic-split)
+                ├── /payment/*     → payment-service:8084
+                └── /notification/* → notification-service:8085
+
+order-service → product-service:8082    (HTTP GET)
+              → inventory-service:8083  (HTTP POST)
+              → payment-service:8084    (HTTP POST)
+              → kafka:9092             (Kafka Produce: order-confirmed)
+
+kafka:9092 → notification-service:8085  (Kafka Consume: order-confirmed)
+
+All Java services → jaeger:4317         (OTLP gRPC Traces)
+All Java services → prometheus:9090     (OTLP HTTP Metrics)
+APISIX            → jaeger:4318         (OTLP HTTP Traces)
+Grafana           → prometheus:9090     (PromQL Queries)
+```
 
 ---
 
