@@ -1610,6 +1610,38 @@ env:
 | JVM Metrics | Heap/Non-Heap Memory、GC Count/Duration、Thread Count、Memory Pool、Class Loading |
 | Kafka Metrics | Producer Send Rate、Consumer Receive Rate、Consumer Lag、DLT Messages |
 
+#### Service Health Overview
+
+![Grafana Service Health](docs/grafana-service-health.png)
+
+顯示所有微服務的整體健康狀態，包含：
+- **Request Rate (req/s)**：每秒請求數，依服務篩選
+- **Error Rate (%)**：5xx 錯誤比例
+- **Response Latency (p50, p95, p99)**：回應延遲百分位數
+- **DB Connection Pool Usage / used vs idle**：資料庫連線池使用與閒置狀態
+
+#### JVM Metrics
+
+![Grafana JVM Metrics](docs/grafana-jvm-metrics.png)
+
+顯示所有 Java 微服務的 JVM 指標，包含：
+- **Heap Memory**：各服務 Heap 使用量、committed、limit（可觀察 OTel Agent 記憶體開銷）
+- **Non-Heap Memory**：Metaspace 等非堆積記憶體使用狀態
+- **GC Count Rate / Duration Rate**：垃圾回收頻率與耗時
+- **Thread Count**：各服務執行緒數量變化
+
+#### Kafka Metrics
+
+![Grafana Kafka Metrics](docs/grafana-kafka-metrics.png)
+
+顯示 Kafka 訊息佇列相關指標，包含：
+- **Producer Send Rate (messages/s)**：生產者發送速率
+- **Consumer Receive Rate (messages/s)**：消費者接收速率
+- **Consumer Lag (max)**：消費者落後筆數（越高代表處理越慢）
+- **Producer Throughput (bytes/s)**：生產者吞吐量
+- **DLT Messages (send rate)**：死信佇列訊息數量
+- **Consumer Lag by Topic**：依 Topic 分類的消費者落後狀態
+
 **告警規則：**
 
 | 規則 | 觸發條件 | 嚴重度 |
