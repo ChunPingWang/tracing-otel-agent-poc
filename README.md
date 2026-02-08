@@ -1733,11 +1733,31 @@ Grafana           → prometheus:9090     (PromQL Queries)
 
 #### Service Health Overview
 
-![Grafana Service Health](docs/grafana-product-offline-health.png)
+![Grafana Service Health](docs/grafana-service-health.png)
 
-Grafana Service Health Overview 儀表板顯示：
-- **Request Rate**：product-service 在測試執行期間（約 12:50）出現請求量變化
+服務整體健康狀態儀表板，可觀察離線與恢復期間的變化：
+- **Request Rate (req/s)**：product-service 在測試期間的請求量變化
+- **Error Rate (%)**：離線期間的錯誤率飆升
 - **Response Latency (p50, p95, p99)**：恢復後的延遲數據，可觀察冷啟動對延遲的影響
+- **DB Connection Pool**：資料庫連線池使用與閒置狀態
+
+#### JVM Metrics
+
+![Grafana JVM Metrics](docs/grafana-jvm-metrics.png)
+
+JVM 指標儀表板，可觀察服務離線與重啟對 JVM 的影響：
+- **Heap Memory**：product-service 重啟後 Heap 使用量從零開始增長
+- **Non-Heap Memory**：各服務 Metaspace 使用狀態，OTel Agent 會增加約 20-30 MiB
+- **Thread Count**：服務重啟後執行緒數量恢復過程
+
+#### Kafka Metrics
+
+![Grafana Kafka Metrics](docs/grafana-kafka-metrics.png)
+
+Kafka 指標儀表板，可觀察離線期間對非同步訊息的影響：
+- **Producer Send Rate**：離線期間訂單失敗，無 Kafka 訊息產生
+- **Consumer Receive Rate**：恢復後消費者重新開始接收訊息
+- **Producer Throughput (bytes/s)**：order-service-blue 的生產者吞吐量
 
 ### 關鍵觀察
 
