@@ -1249,6 +1249,12 @@ curl -X POST http://localhost:8081/api/orders \
 
 **預期結果**：訂單狀態為 `CONFIRMED`，Jaeger 中可看到涵蓋 5 個服務的完整 Trace。
 
+**Jaeger Trace Waterfall：**
+
+![Scenario 1 - Happy Path](docs/jaeger-scenario1-happy-path.png)
+
+> 44 個 Spans 橫跨 6 個服務。可清楚看到請求依序經過 order → product → inventory → payment，最後透過 Kafka 非同步觸發 notification-service。每一層的 HTTP 呼叫、JPA 查詢、Kafka produce/consume 都被 OTel Agent 自動捕捉。
+
 ### 場景二：庫存不足
 
 ```bash
@@ -1258,6 +1264,12 @@ curl -X POST http://localhost:8081/api/orders \
 ```
 
 **預期結果**：訂單狀態為 `FAILED`，Jaeger 中 Inventory Service Span 帶有 `error=true`。
+
+**Jaeger Trace Waterfall：**
+
+![Scenario 2 - Inventory Shortage](docs/jaeger-scenario2-inventory-shortage.png)
+
+> 僅 9 個 Spans。請求在 product-service 查詢商品後即觸發錯誤（紅色 Span），order-service 回傳 `BasicErrorController.error`。由於庫存不足在早期就被攔截，後續的 inventory/payment/kafka/notification 流程都不會執行，因此 Trace 非常短。
 
 ### 場景三：支付超時
 
@@ -1275,6 +1287,12 @@ curl -X POST "http://localhost:8084/api/admin/simulate-delay?ms=0"
 ```
 
 **預期結果**：訂單狀態為 `PAYMENT_TIMEOUT`，Jaeger 中可看到庫存回滾呼叫。
+
+**Jaeger Trace Waterfall：**
+
+![Scenario 3 - Payment Timeout](docs/jaeger-scenario3-payment-timeout.png)
+
+> 45 個 Spans。最顯著的特徵是 payment-service 的 Span 特別長（模擬 5 秒延遲，超過 3 秒 timeout）。超時後可以看到 order-service 呼叫 `inventory/release` 進行庫存回滾（橘色 Span），確保資料一致性。整條 Trace 呈現了完整的補償交易流程。
 
 ### 場景四：Kafka 非同步通知（Async Trace Propagation）
 
@@ -1317,6 +1335,12 @@ sequenceDiagram
     Note over Client,Notification: Jaeger 中可看到：同一條 Trace<br/>包含 HTTP Spans + Kafka Produce Span + Kafka Consume Span
 ```
 
+**Jaeger Trace Waterfall：**
+
+![Scenario 4 - Kafka Async Notification](docs/jaeger-scenario4-kafka-async.png)
+
+> 44 個 Spans。與場景一結構類似，重點觀察 Trace 尾端：`order-confirmed publish`（Kafka Producer Span）與 `order-confirmed process`（Kafka Consumer Span）之間存在 parent-child 關係，證明 OTel Agent 成功透過 Kafka Record Header 傳遞了 `traceparent`，將同步 HTTP 與非同步 Kafka 串聯在同一條 Trace 中。
+
 **在 Jaeger 中觀察重點：**
 - Kafka Producer Span（`order-service` 的 `order-confirmed send`）與 Consumer Span（`notification-service` 的 `order-confirmed process`）共享同一個 TraceID
 - Consumer Span 的 parent 是 Producer Span，形成完整的非同步追蹤鏈
@@ -1341,6 +1365,12 @@ curl -X POST "http://localhost:8085/api/admin/simulate-failure?enabled=false"
 ```
 
 **預期結果**：Jaeger 中有多個 Consumer Span（原始 + 3 次重試），最後產生 DLT Producer Span。
+
+**Jaeger Trace Waterfall：**
+
+![Scenario 5 - Kafka DLT](docs/jaeger-scenario5-kafka-dlt.png)
+
+> 39 個 Spans。在 notification-service 區段可以看到紅色的錯誤 Span（模擬消費失敗）。Kafka Consumer 會自動重試（Spring Kafka 預設重試 3 次），每次重試都會產生新的 Span。重試耗盡後，訊息被轉發至 Dead Letter Topic (DLT)，確保失敗的訊息不會遺失。
 
 ---
 
