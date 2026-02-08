@@ -35,20 +35,30 @@ spec:
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
         - name: KAFKA_CONTROLLER_QUORUM_VOTERS
-          value: "1@kafka:9093"
+          value: "1@localhost:9093"
         - name: KAFKA_CONTROLLER_LISTENER_NAMES
           value: "CONTROLLER"
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "1"
+        - name: CLUSTER_ID
+          value: "MkU3OEVBNTcwNTJENDM2Qk"
+        - name: KAFKA_LOG_DIRS
+          value: "/tmp/kafka-logs"
+        volumeMounts:
+        - name: kafka-data
+          mountPath: /tmp/kafka-logs
         readinessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 10
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "100m"
           limits:
-            memory: "1Gi"
-            cpu: "500m"
+            memory: "512Mi"
+            cpu: "300m"
+      volumes:
+      - name: kafka-data
+        emptyDir: {}

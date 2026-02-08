@@ -128,7 +128,7 @@ deploy_base_services() {
   kubectl apply -f "${K8S_DIR}/jaeger/" -n ecommerce
 
   print_info "Waiting for Kafka to be ready..."
-  kubectl wait --for=condition=ready pod -l app=kafka -n ecommerce --timeout=120s
+  kubectl wait --for=condition=ready pod -l app=kafka -n ecommerce --timeout=300s
   print_ok "Kafka is ready"
 
   print_info "Waiting for Jaeger to be ready..."
