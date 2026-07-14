@@ -4,6 +4,16 @@
 
 ---
 
+## 🎬 教學導覽影片（給完全初學者）
+
+一支慢速、高畫質、全程繁體中文字幕的導覽影片，帶你從零理解 OpenTelemetry 如何做分散式鏈路追蹤 —— 涵蓋 **Trace / Span 觀念**、**零侵入 Bytecode Instrumentation 原理**、**W3C traceparent 跨服務傳播**、**Kafka 非同步串接**，以及本 PoC 實際部署後在 **Jaeger 與 Grafana** 中看到的真實畫面。
+
+▶️ **[docs/videos/otel-tracing-poc-demo.mp4](docs/videos/otel-tracing-poc-demo.mp4)**（約 3.5 分鐘，1080p，附 [繁中字幕檔 .srt](docs/videos/otel-tracing-poc-demo.zh-TW.srt)）
+
+> 影片中的 Jaeger 追蹤列表與瀑布圖為本次部署的**即時實機截圖**；場景錯誤/超時追蹤與 Grafana 儀表板為對應的實機畫面。
+
+---
+
 ## 這個專案在解決什麼問題？
 
 在微服務架構下，一個使用者請求（例如「下單」）會經過多個服務：

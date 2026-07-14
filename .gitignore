@@ -46,3 +46,5 @@ opentelemetry-javaagent.jar
 # Temporary
 *.tmp
 *.bak
+docker-compose.override.yml
+docker-compose.local.yml
