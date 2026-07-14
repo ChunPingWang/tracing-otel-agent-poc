@@ -10,7 +10,7 @@
 
 ▶️ **[docs/videos/otel-tracing-poc-demo.mp4](docs/videos/otel-tracing-poc-demo.mp4)**（約 3.5 分鐘，1080p，附 [繁中字幕檔 .srt](docs/videos/otel-tracing-poc-demo.zh-TW.srt)）
 
-> 影片中的 Jaeger 追蹤列表與瀑布圖為本次部署的**即時實機截圖**；場景錯誤/超時追蹤與 Grafana 儀表板為對應的實機畫面。
+> 影片中所有 Jaeger 畫面（追蹤列表、完整瀑布圖、Span 屬性、庫存不足錯誤、支付超時）與 Grafana 三個儀表板（服務健康、JVM、Kafka）**全部為本次 Docker Compose 部署後、實際觸發流程所擷取的即時實機數據**。
 
 ---
 
