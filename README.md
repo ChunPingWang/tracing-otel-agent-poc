@@ -6,11 +6,13 @@
 
 ## 🎬 教學導覽影片（給完全初學者）
 
-一支慢速、高畫質、全程繁體中文字幕的導覽影片，帶你從零理解 OpenTelemetry 如何做分散式鏈路追蹤 —— 涵蓋 **Trace / Span 觀念**、**零侵入 Bytecode Instrumentation 原理**、**W3C traceparent 跨服務傳播**、**Kafka 非同步串接**，以及本 PoC 實際部署後在 **Jaeger 與 Grafana** 中看到的真實畫面。
+一支慢速、高畫質、全程繁體中文字幕的導覽影片，帶你從零理解 OpenTelemetry 如何做分散式鏈路追蹤 —— 特別為**完全初學者**設計，用**四張循序圖**逐步拆解原理：**Trace / Span 觀念**、**零侵入 Bytecode Instrumentation 原理**、**W3C traceparent 跨服務傳播**、**Kafka 非同步串接**、**OTLP 送往 Jaeger 的流程**，以及本 PoC 實際部署後在 **Jaeger 與 Grafana** 中看到的真實畫面。
 
-▶️ **[docs/videos/otel-tracing-poc-demo.mp4](docs/videos/otel-tracing-poc-demo.mp4)**（約 3.5 分鐘，1080p，附 [繁中字幕檔 .srt](docs/videos/otel-tracing-poc-demo.zh-TW.srt)）
+▶️ **[docs/videos/otel-tracing-poc-demo.mp4](docs/videos/otel-tracing-poc-demo.mp4)**（約 4.5 分鐘，1080p，附 [繁中字幕檔 .srt](docs/videos/otel-tracing-poc-demo.zh-TW.srt)）
 
-> 影片中所有 Jaeger 畫面（追蹤列表、完整瀑布圖、Span 屬性、庫存不足錯誤、支付超時）與 Grafana 三個儀表板（服務健康、JVM、Kafka）**全部為本次 Docker Compose 部署後、實際觸發流程所擷取的即時實機數據**。
+> **循序圖導向教學**：影片以四張動畫循序圖說明「一筆訂單如何走過五個服務」、「traceparent 如何在 HTTP 間傳遞」、「traceparent 如何搭上 Kafka 訊息完成非同步串接」、「Span 如何經 OTLP 送到 Jaeger」，每一個關鍵都有字幕逐句說明。
+>
+> 影片中所有 Jaeger 畫面（追蹤列表、63 Span 完整瀑布圖、Span 屬性、庫存不足錯誤、支付超時 5 秒）與 Grafana 三個儀表板（服務健康、JVM、Kafka）**全部為本次 Docker Compose 部署後、實際觸發流程所擷取的即時實機數據**。
 
 ---
 
